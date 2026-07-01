@@ -3,211 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบกู้เงินออนไลน์ - สำหรับลูกค้า</title>
+    <title>ZAPP888 - บริการกู้เงินสำหรับลูกค้า</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Prompt', sans-serif; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body class="text-slate-800 h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-hand-holding-dollar text-2xl text-emerald-400"></i>
-                <span class="font-bold text-xl tracking-wide">EasyLoan</span>
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-wallet text-white text-3xl"></i>
             </div>
-            <div id="navUserMenu" class="hidden flex items-center space-x-4">
-                <span id="navUserName" class="text-sm font-medium"></span>
-                <button id="btnSignOut" class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded-lg transition duration-200">
-                    <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
+     <h1 class="text-2xl font-bold text-slate-800">ZAPP888</h1>
+            <p class="text-slate-500 text-sm mt-1 mb-8">เข้าสู่ระบบเพื่อจัดการบัญชีของคุณ</p>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ (ใช้เป็น ID)</label>
+                    <input type="tel" id="loginPhone" placeholder="08xxxxxxxx" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล (สำหรับการสมัครใหม่)</label>
+                    <input type="text" id="loginName" placeholder="ระบุชื่อหากเพิ่งใช้งานครั้งแรก" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/30 mt-4">
+                    เข้าสู่ระบบ / ลงทะเบียน
                 </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        
-        <div id="authSection" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-slate-100 my-10">
-            <div class="flex border-b border-slate-200 mb-6">
-                <button id="tabLogin" class="w-1/2 pb-3 font-semibold text-blue-600 border-b-2 border-blue-600 text-center">เข้าสู่ระบบ</button>
-                <button id="tabRegister" class="w-1/2 pb-3 font-semibold text-slate-400 text-center">สมัครสมาชิก</button>
-            </div>
-
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">อีเมล</label>
-                    <input type="email" id="loginEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="loginPassword" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-md shadow-blue-200">เข้าสู่ระบบ</button>
-            </form>
-
-            <form id="registerForm" class="space-y-4 hidden">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">ชื่อจริง</label>
-                        <input type="text" id="regFirstName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">นามสกุล</label>
-                        <input type="text" id="regLastName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">เบอร์โทรศัพท์</label>
-                    <input type="tel" id="regPhone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">อีเมล</label>
-                    <input type="email" id="regEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="regPassword" required minlength="6" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                </div>
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 rounded-xl transition shadow-md shadow-emerald-200">สมัครสมาชิก</button>
-            </form>
-        </div>
-
-        <div id="dashboardSection" class="hidden space-y-8">
-            <div id="statusBanner" class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-amber-500 flex justify-between items-center hidden">
-                <div>
-                    <h3 class="text-sm font-medium text-slate-500">สถานะคำขอกู้เงินปัจจุบันของคุณ</h3>
-                    <p id="txtBannerStatus" class="text-xl font-bold mt-1 text-amber-600">กำลังรอการตรวจสอบ...</p>
-                    <p id="txtBannerDetails" class="text-xs text-slate-400 mt-1"></p>
-                </div>
-                <div class="text-right">
-                    <span class="text-xs text-slate-400">วงเงินที่ยื่นขอ</span>
-                    <p id="txtBannerAmount" class="text-2xl font-bold text-slate-700">฿0</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div id="loanFormContainer" class="md:col-span-2 bg-white rounded-2xl shadow-md p-6 border border-slate-100 space-y-4">
-                    <h2 class="text-xl font-bold text-slate-800 flex items-center mb-4">
-                        <i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-600"></i> ยื่นคำขอรับสินเชื่อ
-                    </h2>
-                    
-                    <form id="loanForm" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">ยอดเงินที่ต้องการกู้ (บาท)</label>
-                                <input type="number" id="loanAmount" required min="1000" placeholder="ระบุจำนวนเงิน" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">วันที่ต้องการคืน</label>
-                                <input type="date" id="loanReturnDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">เลือกธนาคารรับเงิน</label>
-                                <select id="loanBank" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white">
-                                    <option value="" disabled selected>-- เลือกธนาคาร --</option>
-                                    <option value="ธนาคารกสิกรไทย (KBANK)">ธนาคารกสิกรไทย (KBANK)</option>
-                                    <option value="ธนาคารไทยพาณิชย์ (SCB)">ธนาคารไทยพาณิชย์ (SCB)</option>
-                                    <option value="ธนาคารกรุงเทพ (BBL)">ธนาคารกรุงเทพ (BBL)</option>
-                                    <option value="ธนาคารกรุงไทย (KTB)">ธนาคารกรุงไทย (KTB)</option>
-                                    <option value="ธนาคารทหารไทยธนชาต (TTB)">ธนาคารทหารไทยธนชาต (TTB)</option>
-                                    <option value="ธนาคารกรุงศรีอยุธยา (BAY)">ธนาคารกรุงศรีอยุธยา (BAY)</option>
-                                    <option value="ธนาคารออมสิน (GSB)">ธนาคารออมสิน (GSB)</option>
-                                    <option value="ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (ธ.ก.ส.)">ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (ธ.ก.ส.)</option>
-                                    <option value="ธนาคารอาคารสงเคราะห์ (GHB)">ธนาคารอาคารสงเคราะห์ (GHB)</option>
-                                    <option value="ธนาคารยูโอบี (UOB)">ธนาคารยูโอบี (UOB)</option>
-                                    <option value="ธนาคารซีไอเอ็มบีไทย (CIMBT)">ธนาคารซีไอเอ็มบีไทย (CIMBT)</option>
-                                    <option value="ธนาคารแลนด์ แอนด์ เฮ้าส์ (LHBANK)">ธนาคารแลนด์ แอนด์ เฮ้าส์ (LHBANK)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">เลขที่บัญชีธนาคาร</label>
-                                <input type="text" id="loanAccountNo" required placeholder="เช่น 123-4-56789-0" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                            </div>
-                        </div>
-
-                        <button type="button" id="btnPreviewLoan" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition shadow-md shadow-indigo-200">
-                            ตรวจสอบและสรุปข้อมูลคำขอ
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-100 space-y-4 h-fit">
-                    <h2 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center">
-                        <i class="fa-solid fa-user-shield mr-2 text-emerald-500"></i> ข้อมูลผู้ใช้งาน
-                    </h2>
-                    <div class="space-y-3 text-sm">
-                        <div>
-                            <span class="text-slate-400 block">ชื่อ-นามสกุล</span>
-                            <span id="profName" class="font-medium text-slate-700">-</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">เบอร์โทรศัพท์</span>
-                            <span id="profPhone" class="font-medium text-slate-700">-</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">อีเมลบัญชี</span>
-                            <span id="profEmail" class="font-medium text-slate-700">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="summaryCard" class="hidden bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl shadow-xl p-6 border border-slate-800 space-y-4">
-                <h3 class="text-lg font-bold text-emerald-400 flex items-center">
-                    <i class="fa-solid fa-clipboard-check mr-2"></i> หน้ารายงานสรุปข้อมูลการขอกู้เงิน
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                    <p><span class="text-slate-400">ผู้ขอรับสินเชื่อ:</span> <span id="sumName" class="font-semibold ml-1"></span></p>
-                    <p><span class="text-slate-400">เบอร์โทรศัพท์:</span> <span id="sumPhone" class="font-semibold ml-1"></span></p>
-                    <p><span class="text-slate-400">จำนวนเงินที่ขอกู้:</span> <span id="sumAmount" class="font-bold text-lg text-yellow-400 ml-1"></span> บาท</p>
-                    <p><span class="text-slate-400">กำหนดชำระคืนภายในวันที่:</span> <span id="sumDate" class="font-semibold ml-1"></span></p>
-                    <p><span class="text-slate-400">ธนาคารรับเงิน:</span> <span id="sumBank" class="font-semibold ml-1"></span></p>
-                    <p><span class="text-slate-400">เลขที่บัญชี:</span> <span id="sumAcc" class="font-semibold ml-1"></span></p>
-                </div>
-                <div class="flex space-x-4">
-                    <button id="btnCancelSubmit" class="w-1/2 bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 rounded-xl transition">แก้ไขข้อมูล</button>
-                    <button id="btnFinalSubmit" class="w-1/2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition shadow-lg shadow-emerald-900/30">ส่งคำขอกู้เงิน</button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-100">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                    <i class="fa-solid fa-history mr-2 text-slate-500"></i> ประวัติรายการกู้เงินของคุณ
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-500 text-sm font-medium">
-                                <th class="py-3 px-4">วันที่ยื่นเรื่อง</th>
-                                <th class="py-3 px-4">ยอดเงินกู้</th>
-                                <th class="py-3 px-4">ธนาคาร / เลขบัญชี</th>
-                                <th class="py-3 px-4">กำหนดคืน</th>
-                                <th class="py-3 px-4 text-center">สถานะ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="loanHistoryBody" class="text-sm divide-y divide-slate-100">
-                            <tr>
-                                <td colspan="5" class="py-6 text-center text-slate-400">ยังไม่มีประวัติการยื่นคำขอสินเชื่อ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
 
+    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col justify-between shrink-0 h-full shadow-sm z-10">
+        <div>
+            <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-md shadow-blue-600/20">
+                    <i class="fa-solid fa-wallet text-lg"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-800">EasyLoan</h1>
+            </div>
+            <nav class="p-4 space-y-2 mt-2">
+                <button onclick="switchTab('dashboard')" id="nav-desktop-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition bg-blue-50 text-blue-600">
+                    <i class="fa-solid fa-house w-5 text-center"></i> <span>หน้าหลัก</span>
+                </button>
+                <button onclick="switchTab('apply')" id="nav-desktop-apply" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                    <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i> <span>ยื่นขอกู้เงิน</span>
+                </button>
+                <button onclick="switchTab('history')" id="nav-desktop-history" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> <span>ประวัติคำขอ</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-desktop-profile" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                    <i class="fa-solid fa-user w-5 text-center"></i> <span>บัญชีของฉัน</span>
+                </button>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-100">
+            <button onclick="logout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition">
+                <i class="fa-solid fa-right-from-bracket"></i> <span>ออกจากระบบ</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-y-auto pb-20 md:pb-0">
+        
+        <header class="bg-blue-600 text-white px-6 py-5 sticky top-0 z-30 shadow-md md:hidden rounded-b-3xl">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-blue-200 text-xs font-medium">ยินดีต้อนรับกลับมา</p>
+                    <h2 class="text-lg font-bold" id="mobileUserName">กำลังโหลด...</h2>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+            </div>
+        </header>
+
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 sticky top-0 z-30 hidden md:flex justify-between items-center shadow-sm">
+            <h2 id="pageTitle" class="text-xl font-bold text-slate-800">ภาพรวมบัญชี (Dashboard)</h2>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-slate-500 font-medium" id="desktopUserName">กำลังโหลด...</span>
+                <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold border border-blue-200">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 md:p-8 max-w-5xl w-full mx-auto space-y-6">
+
+            <section id="sec-dashboard" class="space-y-6 animate-in fade-in duration-300">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-3xl p-6 text-white shadow-xl shadow-blue-900/20 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <p class="text-blue-100 text-sm font-medium opacity-90">วงเงินกู้ที่รอชำระ (ยอดจัดล่าสุด)</p>
+                    <h3 id="dashCurrentDebt" class="text-4xl font-extrabold mt-1 tracking-tight">฿0.00</h3>
+                    
+                    <div class="mt-6 flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-blue-200 uppercase tracking-wider">สถานะบัญชี</p>
+                            <p id="dashAccountStatus" class="font-semibold text-sm mt-0.5"><i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> ปกติ</p>
+                        </div>
+                        <div>
+                            <button onclick="switchTab('apply')" class="bg-white text-blue-700 px-5 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-blue-50 transition transform active:scale-95">
+                                ขอกู้เพิ่ม
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-slate-700 text-lg">เมนูด่วน</h4>
+                <div class="grid grid-cols-4 gap-3 text-center">
+                    <button onclick="switchTab('apply')" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex flex-col items-center justify-center gap-2">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mb-1"><i class="fa-solid fa-money-bill-wave text-xl"></i></div>
+                        <span class="text-xs font-medium text-slate-600">ยื่นกู้เงิน</span>
+                    </button>
+                    <button onclick="switchTab('history')" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex flex-col items-center justify-center gap-2">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1"><i class="fa-solid fa-receipt text-xl"></i></div>
+                        <span class="text-xs font-medium text-slate-600">ประวัติ</span>
+                    </button>
+                    <button class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 mb-1"><i class="fa-solid fa-qrcode text-xl"></i></div>
+                        <span class="text-xs font-medium text-slate-600">จ่ายบิล</span>
+                    </button>
+                    <button class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                        <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 mb-1"><i class="fa-solid fa-headset text-xl"></i></div>
+                        <span class="text-xs font-medium text-slate-600">ติดต่อ</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-circle-info text-blue-500 mr-2"></i> อัปเดตล่าสุดจากระบบ</h4>
+                    <div id="latestActivityBox" class="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 border-dashed text-center">
+                        ยังไม่มีประวัติการทำรายการเร็วๆ นี้
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-apply" class="space-y-6 hidden animate-in fade-in duration-300">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+                        <h3 class="font-bold text-blue-800 flex items-center"><i class="fa-solid fa-file-invoice-dollar mr-2"></i> แบบฟอร์มยื่นคำขอกู้เงินใหม่</h3>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <label class="block text-sm font-bold text-slate-700 mb-3">ต้องการวงเงินเท่าไหร่? (บาท)</label>
+                            <div class="flex items-center space-x-4">
+                                <button onclick="adjAmount(-1000)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm text-slate-600 font-bold hover:bg-slate-100">-</button>
+                                <input type="number" id="inpAmount" value="5000" class="flex-1 text-center bg-white border border-slate-300 rounded-xl py-3 text-xl font-bold text-blue-600 outline-none focus:border-blue-500" readonly>
+                                <button onclick="adjAmount(1000)" class="w-10 h-10 rounded-full bg-white border border-slate-300 shadow-sm text-slate-600 font-bold hover:bg-slate-100">+</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">เลือกธนาคารรับเงิน</label>
+                                <select id="inpBank" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                                    <option value="กสิกรไทย (KBank)">กสิกรไทย (KBank)</option>
+                                    <option value="ไทยพาณิชย์ (SCB)">ไทยพาณิชย์ (SCB)</option>
+                                    <option value="กรุงไทย (KTB)">กรุงไทย (KTB)</option>
+                                    <option value="กรุงเทพ (BBL)">กรุงเทพ (BBL)</option>
+                                    <option value="กรุงศรี (BAY)">กรุงศรี (BAY)</option>
+                                    <option value="พร้อมเพย์ (PromptPay)">พร้อมเพย์ (เบอร์โทร/บัตรปชช)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">เลขบัญชี / เบอร์พร้อมเพย์</label>
+                                <input type="text" id="inpAccount" placeholder="ระบุเลขบัญชีให้ถูกต้อง" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ระยะเวลาคืนเงิน (วัน)</label>
+                                <select id="inpDuration" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition">
+                                    <option value="7">7 วัน</option>
+                                    <option value="15">15 วัน</option>
+                                    <option value="30">30 วัน</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 flex items-start mt-4">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5 mr-2"></i>
+                            <p>กรุณาตรวจสอบเลขบัญชีให้ถูกต้อง หากข้อมูลผิดพลาดระบบจะปฏิเสธคำขอทันที และการอนุมัติขึ้นอยู่กับการพิจารณาของแอดมิน</p>
+                        </div>
+
+                        <button onclick="submitLoanRequest()" id="btnSubmitLoan" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-blue-600/30 flex justify-center items-center">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> ยืนยันการยื่นขอสินเชื่อ
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-history" class="space-y-4 hidden animate-in fade-in duration-300">
+                <h3 class="font-bold text-slate-700 text-lg mb-2">ประวัติและสถานะคำขอ</h3>
+                <div id="historyList" class="space-y-4">
+                    </div>
+            </section>
+
+            <section id="sec-profile" class="space-y-6 hidden animate-in fade-in duration-300">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 text-center">
+                    <div class="w-24 h-24 bg-slate-100 rounded-full mx-auto flex items-center justify-center text-slate-400 text-4xl mb-4 border-4 border-white shadow-md">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <h3 id="profName" class="text-xl font-bold text-slate-800">ชื่อ-นามสกุล</h3>
+                    <p id="profPhone" class="text-slate-500 mt-1">08X-XXX-XXXX</p>
+                    
+                    <div class="mt-6 border-t border-slate-100 pt-6 text-left space-y-4">
+                        <div class="flex justify-between items-center p-3 hover:bg-slate-50 rounded-xl transition cursor-pointer">
+                            <div class="flex items-center space-x-3 text-slate-700 font-medium text-sm">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-shield-halved"></i></div>
+                                <span>สถานะบัญชี (Blacklist Check)</span>
+                            </div>
+                            <span id="profStatus" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold">ปกติ</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 hover:bg-slate-50 rounded-xl transition cursor-pointer" onclick="logout()">
+                            <div class="flex items-center space-x-3 text-red-600 font-medium text-sm">
+                                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><i class="fa-solid fa-power-off"></i></div>
+                                <span>ออกจากระบบบัญชีนี้</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <nav class="md:hidden bg-white border-t border-slate-200 fixed bottom-0 w-full z-40 pb-safe">
+        <div class="flex justify-around items-center py-2 px-1">
+            <button onclick="switchTab('dashboard')" id="nav-mobile-dashboard" class="nav-btn-mob flex flex-col items-center p-2 w-16 text-blue-600 transition">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">หน้าหลัก</span>
+            </button>
+            <button onclick="switchTab('apply')" id="nav-mobile-apply" class="nav-btn-mob flex flex-col items-center p-2 w-16 text-slate-400 transition hover:text-slate-600">
+                <i class="fa-solid fa-hand-holding-dollar text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">กู้เงิน</span>
+            </button>
+            <button onclick="switchTab('history')" id="nav-mobile-history" class="nav-btn-mob flex flex-col items-center p-2 w-16 text-slate-400 transition hover:text-slate-600">
+                <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">ประวัติ</span>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-mobile-profile" class="nav-btn-mob flex flex-col items-center p-2 w-16 text-slate-400 transition hover:text-slate-600">
+                <i class="fa-solid fa-user text-xl mb-1"></i>
+                <span class="text-[10px] font-medium">โปรไฟล์</span>
+            </button>
+        </div>
+    </nav>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, addDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdVwtGix3Vspr0VVqW5-M5PL6IQZ-9guk",
@@ -215,177 +266,282 @@
             projectId: "kuku-bd6bd",
             storageBucket: "kuku-bd6bd.firebasestorage.app",
             messagingSenderId: "20260309266",
-            appId: "1:20260309266:web:95cff78d1d9bc402344bcb",
-            measurementId: "G-1YNH71SD69"
+            appId: "1:20260309266:web:95cff78d1d9bc402344bcb"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUserData = null;
+        // State variables
+        let currentUser = null;
+        let userLoans = [];
 
-        // Tabs Toggle Logic
-        const tabLogin = document.getElementById('tabLogin');
-        const tabRegister = document.getElementById('tabRegister');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
-        tabLogin.addEventListener('click', () => {
-            tabLogin.className = "w-1/2 pb-3 font-semibold text-blue-600 border-b-2 border-blue-600 text-center";
-            tabRegister.className = "w-1/2 pb-3 font-semibold text-slate-400 text-center";
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-        });
-
-        tabRegister.addEventListener('click', () => {
-            tabRegister.className = "w-1/2 pb-3 font-semibold text-blue-600 border-b-2 border-blue-600 text-center";
-            tabLogin.className = "w-1/2 pb-3 font-semibold text-slate-400 text-center";
-            registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
-        });
-
-        // Auth Observer
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userDocRef);
-                if (userSnap.exists()) {
-                    currentUserData = userSnap.data();
-                    setupDashboard(user, currentUserData);
-                }
-            } else {
-                document.getElementById('authSection').classList.remove('hidden');
-                document.getElementById('dashboardSection').classList.add('hidden');
-                document.getElementById('navUserMenu').classList.add('hidden');
+        // Check if logged in via localStorage
+        window.onload = () => {
+            const savedPhone = localStorage.getItem('easyloan_phone');
+            const savedName = localStorage.getItem('easyloan_name');
+            if (savedPhone) {
+                loginSuccess(savedPhone, savedName);
             }
-        });
+        };
 
-        // Register Action
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const firstName = document.getElementById('regFirstName').value;
-            const lastName = document.getElementById('regLastName').value;
-            const phone = document.getElementById('regPhone').value;
+        // UI: Adjust Calculator Amount
+        window.adjAmount = function(val) {
+            let el = document.getElementById('inpAmount');
+            let current = parseInt(el.value) || 0;
+            let newVal = current + val;
+            if(newVal < 1000) newVal = 1000;
+            if(newVal > 50000) newVal = 50000;
+            el.value = newVal;
+        }
+
+        // Login Logic Simulator
+        window.handleLogin = async function() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+            
+            if(!phone || phone.length < 9) { alert("กรุณาระบุเบอร์โทรศัพท์ให้ถูกต้อง"); return; }
+            if(!name) { alert("กรุณาระบุชื่อ-นามสกุล"); return; }
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "users", userCredential.user.uid), {
-                    uid: userCredential.user.uid, firstName, lastName, phone, email,
-                    createdAt: new Date().toISOString()
-                });
-                alert("สมัครสมาชิกเรียบร้อยแล้ว!");
-                registerForm.reset();
-                tabLogin.click();
-            } catch (error) { alert("ข้อผิดพลาด: " + error.message); }
-        });
+                // Register/Update User Profile in DB for Blacklist Check
+                await setDoc(doc(db, "users", phone), {
+                    phone: phone,
+                    firstName: name,
+                    email: "user_" + phone + "@easyloan.com",
+                    isBlacklisted: false,
+                    lastLogin: new Date().toISOString()
+                }, { merge: true });
 
-        // Login Action
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                alert("เข้าสู่ระบบสำเร็จ!");
-            } catch (error) { alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง"); }
-        });
+                localStorage.setItem('easyloan_phone', phone);
+                localStorage.setItem('easyloan_name', name);
+                loginSuccess(phone, name);
+            } catch (e) {
+                alert("เกิดข้อผิดพลาด: " + e.message);
+            }
+        }
 
-        // Logout Action
-        document.getElementById('btnSignOut').addEventListener('click', () => { signOut(auth); });
+        function loginSuccess(phone, name) {
+            currentUser = { phone, name };
+            document.getElementById('loginScreen').classList.add('hidden');
+            
+            // Update UI Texts
+            document.getElementById('mobileUserName').innerText = name;
+            document.getElementById('desktopUserName').innerText = name;
+            document.getElementById('profName').innerText = name;
+            document.getElementById('profPhone').innerText = phone;
 
-        // Dashboard Real-time Sync
-        function setupDashboard(user, userData) {
-            document.getElementById('authSection').classList.add('hidden');
-            document.getElementById('dashboardSection').classList.remove('hidden');
-            document.getElementById('navUserMenu').classList.remove('hidden');
+            // Start listening to their loans
+            listenToUserLoans();
+            checkUserStatus();
+        }
 
-            const fullName = `${userData.firstName} ${userData.lastName}`;
-            document.getElementById('navUserName').innerText = fullName;
-            document.getElementById('profName').innerText = fullName;
-            document.getElementById('profPhone').innerText = userData.phone;
-            document.getElementById('profEmail').innerText = userData.email;
+        window.logout = function() {
+            localStorage.removeItem('easyloan_phone');
+            localStorage.removeItem('easyloan_name');
+            location.reload();
+        }
 
-            const loansQuery = query(collection(db, "loans"), where("uid", "==", user.uid));
-            onSnapshot(loansQuery, (snapshot) => {
-                const historyBody = document.getElementById('loanHistoryBody');
-                let rowsHtml = "";
-                let hasPending = false;
-
-                if (snapshot.empty) {
-                    historyBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">ยังไม่มีประวัติการยื่นสินเชื่อ</td></tr>`;
-                    document.getElementById('statusBanner').classList.add('hidden');
-                    document.getElementById('loanFormContainer').classList.remove('opacity-50', 'pointer-events-none');
-                    return;
-                }
-
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const formattedDate = new Date(data.createdAt).toLocaleDateString('th-TH');
-                    
-                    let statusColor = "bg-amber-100 text-amber-700";
-                    let statusText = "รออนุมัติ";
-                    if (data.status === "approved") { statusColor = "bg-emerald-100 text-emerald-700"; statusText = "อนุมัติแล้ว"; }
-                    else if (data.status === "rejected") { statusColor = "bg-red-100 text-red-700"; statusText = "ปฏิเสธ"; }
-
-                    if (data.status === "pending") {
-                        hasPending = true;
-                        document.getElementById('statusBanner').classList.remove('hidden');
-                        document.getElementById('txtBannerStatus').innerText = "กำลังรอระบบตรวจสอบอนุมัติ...";
-                        document.getElementById('txtBannerAmount').innerText = "฿" + parseFloat(data.amount).toLocaleString();
-                        document.getElementById('txtBannerDetails').innerText = `ส่งคำขอเมื่อวันที่ ${formattedDate} | ผ่านธนาคาร ${data.bank}`;
+        // Check if user is blacklisted
+        async function checkUserStatus() {
+            onSnapshot(doc(db, "users", currentUser.phone), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.isBlacklisted) {
+                        document.getElementById('profStatus').innerText = "ถูกระงับสิทธิ์ (Blacklist)";
+                        document.getElementById('profStatus').className = "text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold";
+                        alert("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อแอดมิน");
                     }
-
-                    rowsHtml += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="py-3 px-4 text-slate-600">${formattedDate}</td>
-                            <td class="py-3 px-4 font-bold">฿${parseFloat(data.amount).toLocaleString()}</td>
-                            <td class="py-3 px-4 text-xs"><span class="font-medium block">${data.bank}</span><span class="text-slate-400">${data.accountNumber}</span></td>
-                            <td class="py-3 px-4">${new Date(data.returnDate).toLocaleDateString('th-TH')}</td>
-                            <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusColor}">${statusText}</span></td>
-                        </tr>`;
-                });
-                historyBody.innerHTML = rowsHtml;
-                if (hasPending) document.getElementById('loanFormContainer').classList.add('opacity-50', 'pointer-events-none');
-                else { document.getElementById('statusBanner').classList.add('hidden'); document.getElementById('loanFormContainer').classList.remove('opacity-50', 'pointer-events-none'); }
+                }
             });
         }
 
-        // Preview & Final Submit Logic
-        document.getElementById('btnPreviewLoan').addEventListener('click', () => {
-            if (!loanForm.checkValidity()) { loanForm.reportValidity(); return; }
-            document.getElementById('sumName').innerText = `${currentUserData.firstName} ${currentUserData.lastName}`;
-            document.getElementById('sumPhone').innerText = currentUserData.phone;
-            document.getElementById('sumAmount').innerText = parseFloat(document.getElementById('loanAmount').value).toLocaleString();
-            document.getElementById('sumDate').innerText = new Date(document.getElementById('loanReturnDate').value).toLocaleDateString('th-TH', {year: 'numeric', month: 'long', day: 'numeric'});
-            document.getElementById('sumBank').innerText = document.getElementById('loanBank').value;
-            document.getElementById('sumAcc').innerText = document.getElementById('loanAccountNo').value;
-            summaryCard.classList.remove('hidden');
-            summaryCard.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        document.getElementById('btnCancelSubmit').addEventListener('click', () => { summaryCard.classList.add('hidden'); });
-
-        document.getElementById('btnFinalSubmit').addEventListener('click', async () => {
-            try {
-                await addDoc(collection(db, "loans"), {
-                    uid: auth.currentUser.uid,
-                    borrowerName: `${currentUserData.firstName} ${currentUserData.lastName}`,
-                    phone: currentUserData.phone,
-                    amount: parseFloat(document.getElementById('loanAmount').value),
-                    returnDate: document.getElementById('loanReturnDate').value,
-                    bank: document.getElementById('loanBank').value,
-                    accountNumber: document.getElementById('loanAccountNo').value,
-                    status: "pending",
-                    createdAt: new Date().toISOString()
+        // Read Data Real-time specific to user
+        function listenToUserLoans() {
+            const q = query(collection(db, "loans"), where("phone", "==", currentUser.phone));
+            onSnapshot(q, (snapshot) => {
+                userLoans = [];
+                let totalApprovedDebt = 0;
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    userLoans.push({ id: doc.id, ...data });
+                    if(data.status === 'approved') {
+                        totalApprovedDebt += parseFloat(data.amount);
+                    }
                 });
-                alert("ส่งคำขอกู้เงินสำเร็จเรียบร้อย! ข้อมูลถูกส่งไปที่หลังบ้านแอดมินแล้ว");
-                loanForm.reset();
-                summaryCard.classList.add('hidden');
-            } catch (error) { alert("เกิดข้อผิดพลาด: " + error.message); }
-        });
+
+                // Sort by date DESC
+                userLoans.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                // Update Dashboard
+                document.getElementById('dashCurrentDebt').innerText = "฿" + totalApprovedDebt.toLocaleString('th-TH', {minimumFractionDigits: 2});
+                
+                renderHistory();
+            });
+        }
+
+        // Render History UI
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            let html = "";
+            
+            if(userLoans.length === 0) {
+                list.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 border border-slate-100">ยังไม่มีประวัติการขอกู้เงิน</div>`;
+                document.getElementById('latestActivityBox').innerHTML = "ยังไม่มีประวัติการทำรายการ";
+                return;
+            }
+
+            // Update Latest Box on Dash
+            const latest = userLoans[0];
+            let lText = "กำลังรอตรวจสอบ"; let lColor = "text-amber-500";
+            if(latest.status === 'approved') { lText = "อนุมัติเรียบร้อย"; lColor = "text-emerald-500"; }
+            if(latest.status === 'rejected') { lText = "ถูกปฏิเสธ"; lColor = "text-red-500"; }
+            document.getElementById('latestActivityBox').innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-slate-700">รายการล่าสุด: ฿${parseFloat(latest.amount).toLocaleString()}</span>
+                    <span class="${lColor} font-bold text-xs">${lText}</span>
+                </div>
+            `;
+
+            // Draw full list
+            userLoans.forEach(l => {
+                let badgeClass = "bg-amber-100 text-amber-700";
+                let statusText = "กำลังพิจารณา";
+                let icon = `<i class="fa-solid fa-clock text-amber-500 text-xl"></i>`;
+                
+                if(l.status === 'approved') { 
+                    badgeClass = "bg-emerald-100 text-emerald-700"; 
+                    statusText = "อนุมัติโอนแล้ว"; 
+                    icon = `<i class="fa-solid fa-circle-check text-emerald-500 text-xl"></i>`;
+                }
+                if(l.status === 'rejected') { 
+                    badgeClass = "bg-red-100 text-red-700"; 
+                    statusText = "ไม่อนุมัติ"; 
+                    icon = `<i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>`;
+                }
+
+                const dateFmt = new Date(l.createdAt).toLocaleDateString('th-TH', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+                
+                // Show Admin Notes if exist
+                let noteHtml = "";
+                if(l.adminNotes && l.adminNotes.trim() !== "") {
+                    noteHtml = `
+                        <div class="mt-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-start">
+                            <i class="fa-solid fa-comment-dots text-blue-400 mt-0.5 mr-2"></i>
+                            <div>
+                                <strong class="block text-slate-700 mb-0.5">ข้อความจากแอดมิน:</strong>
+                                ${l.adminNotes}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
+                                    ${icon}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">ขอกู้เงินวงเงิน ฿${parseFloat(l.amount).toLocaleString()}</h4>
+                                    <p class="text-xs text-slate-500">${dateFmt}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}">${statusText}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 mt-2 bg-slate-50/50 p-3 rounded-xl">
+                            <p>ธนาคาร: <span class="font-medium text-slate-800">${l.bank}</span></p>
+                            <p>เลขบัญชี: <span class="font-medium text-slate-800">${l.accountNumber}</span></p>
+                        </div>
+                        ${noteHtml}
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        // Submit Action
+        window.submitLoanRequest = async function() {
+            const btn = document.getElementById('btnSubmitLoan');
+            const amount = document.getElementById('inpAmount').value;
+            const bank = document.getElementById('inpBank').value;
+            const acc = document.getElementById('inpAccount').value.trim();
+            const dur = document.getElementById('inpDuration').value;
+
+            if(!acc) { alert("กรุณาระบุเลขบัญชีให้ถูกต้อง"); return; }
+
+            // Check if blacklist first
+            const userDoc = await getDoc(doc(db, "users", currentUser.phone));
+            if(userDoc.exists() && userDoc.data().isBlacklisted) {
+                alert("บัญชีของคุณถูกระงับสิทธิ์ ไม่สามารถยื่นขอสินเชื่อได้");
+                return;
+            }
+
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังส่งข้อมูล...`;
+            btn.disabled = true;
+
+            try {
+                let returnDate = new Date();
+                returnDate.setDate(returnDate.getDate() + parseInt(dur));
+
+                await addDoc(collection(db, "loans"), {
+                    borrowerName: currentUser.name,
+                    phone: currentUser.phone,
+                    amount: parseFloat(amount),
+                    bank: bank,
+                    accountNumber: acc,
+                    status: "pending",
+                    adminNotes: "", // ทิ้งว่างไว้ให้แอดมินพิมพ์
+                    createdAt: new Date().toISOString(),
+                    returnDate: returnDate.toISOString()
+                });
+
+                alert("ยื่นเรื่องสำเร็จ! กรุณารอแอดมินพิจารณาภายใน 24 ชม.");
+                document.getElementById('inpAccount').value = ""; // clear form
+                switchTab('history'); // redirect
+            } catch (e) {
+                alert("เกิดข้อผิดพลาด: " + e.message);
+            }
+
+            btn.innerHTML = `<i class="fa-solid fa-paper-plane mr-2"></i> ยืนยันการยื่นขอสินเชื่อ`;
+            btn.disabled = false;
+        }
+
+        // UI Tabs Controller
+        window.switchTab = function(tabId) {
+            // Hide all tabs
+            ['dashboard', 'apply', 'history', 'profile'].forEach(id => {
+                document.getElementById(`sec-${id}`).classList.add('hidden');
+            });
+            // Show active
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+            // Handle Desktop Menu Highlight
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-slate-500 hover:bg-slate-50 hover:text-slate-800";
+            });
+            const dBtn = document.getElementById(`nav-desktop-${tabId}`);
+            if(dBtn) dBtn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition bg-blue-50 text-blue-600";
+
+            // Handle Mobile Menu Highlight
+            document.querySelectorAll('.nav-btn-mob').forEach(btn => {
+                btn.className = "nav-btn-mob flex flex-col items-center p-2 w-16 text-slate-400 transition hover:text-slate-600";
+            });
+            const mBtn = document.getElementById(`nav-mobile-${tabId}`);
+            if(mBtn) mBtn.className = "nav-btn-mob flex flex-col items-center p-2 w-16 text-blue-600 transition";
+
+            // Update Titles
+            const titleMap = {
+                'dashboard': 'ภาพรวมบัญชี (Dashboard)',
+                'apply': 'ยื่นขอสินเชื่อ',
+                'history': 'ประวัติทำรายการ',
+                'profile': 'ข้อมูลผู้ใช้งาน'
+            };
+            document.getElementById('pageTitle').innerText = titleMap[tabId];
+        }
+
     </script>
 </body>
 </html>
