@@ -255,7 +255,6 @@
             transform: translateY(-2px);
         }
 
-        /* ปุ่มเริ่มเกมเวอร์ชันต่างๆ */
         .btn-game-normal {
             background: linear-gradient(90deg, #b3002d 0%, #ff003c 100%);
             color: white;
@@ -520,8 +519,8 @@
                     </div>
 
                     <div class="countdown-container">
-                        <div class="countdown-title"><i class="fa-regular fa-clock"></i> ระยะเวลาคงเหลือ</div>
-                        <div id="expireCountdownDisplay" class="countdown-timer">00 วัน 00 ชม. 00 น. 00 ว.</div>
+                        <div class="countdown-title"><i class="fa-regular fa-calendar-xmark"></i> วันที่หมดอายุ</div>
+                        <div id="expireDateDisplay" class="countdown-timer">กำลังประมวลผล...</div>
                     </div>
                 </div>
             </div>
@@ -573,16 +572,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let countdownIntervalId = null;
+        // ตัวแปรสำหรับเก็บ Listener ของผู้ใช้ปัจจุบัน เพื่อเช็คการเตะออกหรือรีเซ็ต
+        let currentSessionListener = null;
 
         // --- 2. ฟังก์ชันสลับหน้าต่างแท็บเมนูย่อย ---
         function switchTab(tabId, buttonElement) {
-            // ซ่อนแท็บทั้งหมด
             document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-            // เอาคลาสปุ่ม active ออกทั้งหมด
             document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            // เปิดแสดงแท็บและปุ่มที่ถูกเลือก
             document.getElementById(tabId).classList.add('active');
             buttonElement.classList.add('active');
         }
@@ -655,20 +652,21 @@
                 const currentServerTimestamp = new Date().getTime();
 
                 if(keyData.status === "unused") {
-                    const calculatedExpiryTime = currentServerTimestamp + (keyData.days * 24 * 60 * 60 * 1000);
+                    // 🔴 [จุดแก้ไขสำเร็จ] เช็คก่อนว่าคีย์มีค่าเวลาเก่าฝังอยู่ไหม ถ้ามีให้ใช้ค่าเก่า ห้ามเอาเวลาปัจจุบันไปบวกใหม่เด็ดขาด!
+                    const calculatedExpiryTime = keyData.expiresAt ? keyData.expiresAt : (currentServerTimestamp + (keyData.days * 24 * 60 * 60 * 1000));
                     
                     db.collection("keys").doc(key).update({
                         status: "used",
                         deviceId: myDeviceId,
                         expiresAt: calculatedExpiryTime
                     }).then(() => {
-                        executeSuccessfulLogin(key, calculatedExpiryTime);
+                        executeSuccessfulLogin(key);
                     }).catch(err => {
                         Swal.fire('เกิดข้อผิดพลาดในการบันทึกสิทธิ์', err.message, 'error');
                     });
                 } 
                 else if (keyData.status === "used") {
-                    if(keyData.deviceId !== myDeviceId) {
+                    if(keyData.deviceId && keyData.deviceId !== myDeviceId) {
                         Swal.close();
                         Swal.fire({
                             icon: 'error',
@@ -696,17 +694,28 @@
                         return;
                     }
 
-                    executeSuccessfulLogin(key, keyData.expiresAt);
+                    // หากข้อมูลถูกต้องและแอดมินเพิ่งรีเซ็ต (deviceId ว่าง) ให้จับผูกเครื่องใหม่
+                    if(!keyData.deviceId) {
+                        db.collection("keys").doc(key).update({
+                            deviceId: myDeviceId
+                        }).then(() => {
+                            executeSuccessfulLogin(key);
+                        });
+                    } else {
+                        executeSuccessfulLogin(key);
+                    }
                 }
             }).catch(error => {
                 Swal.close();
                 console.error("ไม่สามารถตรวจสอบข้อมูลกับคลาวด์ได้: ", error);
-                Swal.fire('ระบบล้มเหลว', 'ไม่สามารถเข้าถึงฐานข้อมูลเพื่อยืนยันสถานะได้ในขณะนี้', 'error');
+                if(!isSessionAutoLogin) {
+                    Swal.fire('ระบบล้มเหลว', 'ไม่สามารถเข้าถึงฐานข้อมูลเพื่อยืนยันสถานะได้ในขณะนี้', 'error');
+                }
             });
         }
 
         // --- 7. เปลี่ยนการแสดงผลหลังล็อกอินผ่าน ---
-        function executeSuccessfulLogin(verifiedKey, expiresAtTime) {
+        function executeSuccessfulLogin(verifiedKey) {
             Swal.close();
             localStorage.setItem('riszy_saved_key', verifiedKey);
             
@@ -714,38 +723,60 @@
             document.getElementById('dashboardScreen').style.display = 'block';
             document.getElementById('deviceIdDisplay').innerText = myDeviceId;
 
-            startLiveExpirationCountdown(expiresAtTime);
+            // เริ่มการตรวจสอบคีย์แบบ Real-time
+            startRealTimeSessionMonitor(verifiedKey);
             renderCloudFeaturesList();
         }
 
-        // --- 8. ระบบนับเวลาถอยหลังอายุคีย์ ---
-        function startLiveExpirationCountdown(targetTimestamp) {
-            if(countdownIntervalId) clearInterval(countdownIntervalId);
+        // --- 8. ระบบตรวจสอบเซสชั่นและแสดงวันที่หมดอายุ (Real-time Kicking) ---
+        function startRealTimeSessionMonitor(key) {
+            if(currentSessionListener) currentSessionListener(); // ยกเลิกการซิงค์ตัวเก่าถ้ามี
 
-            function updateTimerString() {
-                const nowTimestamp = new Date().getTime();
-                const distanceTime = targetTimestamp - nowTimestamp;
-
-                if (distanceTime <= 0) {
-                    clearInterval(countdownIntervalId);
-                    document.getElementById('expireCountdownDisplay').innerText = "หมดเวลาการใช้งานแล้ว";
-                    Swal.fire('หมดสิทธิ์การใช้งาน', 'คีย์ของคุณหมดอายุลงแล้วระหว่างเซสชั่น', 'info').then(() => {
-                        window.location.reload();
-                    });
-                    return;
+            currentSessionListener = db.collection("keys").doc(key).onSnapshot(doc => {
+                if (!doc.exists) {
+                    return triggerForceLogout('คีย์ถูกลบออกจากระบบ', 'คีย์ของคุณถูกเพิกถอนโดยแอดมิน กรุณาติดต่อผู้ดูแล');
                 }
 
-                const daysCalculated = Math.floor(distanceTime / (1000 * 60 * 60 * 24));
-                const hoursCalculated = Math.floor((distanceTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutesCalculated = Math.floor((distanceTime % (1000 * 60 * 60)) / (1000 * 60));
-                const secondsCalculated = Math.floor((distanceTime % (1000 * 60)) / 1000);
+                const keyData = doc.data();
+                const nowTimestamp = new Date().getTime();
 
-                document.getElementById('expireCountdownDisplay').innerText = 
-                    `${daysCalculated} วัน ${hoursCalculated} ชม. ${minutesCalculated} น. ${secondsCalculated} ว.`;
-            }
+                // เช็คว่าหมดอายุหรือยัง
+                if (nowTimestamp > keyData.expiresAt) {
+                    return triggerForceLogout('หมดสิทธิ์การใช้งาน', 'คีย์ของคุณหมดอายุลงแล้ว');
+                }
 
-            updateTimerString();
-            countdownIntervalId = setInterval(updateTimerString, 1000);
+                // หากแอดมินรีเซ็ต Device ID หรือเปลี่ยนสถานะกลางคัน
+                if (keyData.status !== 'used' || (keyData.deviceId && keyData.deviceId !== myDeviceId)) {
+                    return triggerForceLogout('เซสชันถูกยกเลิก', 'แอดมินได้ทำการรีเซ็ตเครื่อง หรือมีการเข้าสู่ระบบซ้อน กรุณาล็อกอินใหม่');
+                }
+
+                // แปลงเวลา Timestamp เป็นวันที่แสดงผลสวยงาม
+                const expiryDateObj = new Date(keyData.expiresAt);
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                const formattedDate = expiryDateObj.toLocaleString('th-TH', options);
+
+                document.getElementById('expireDateDisplay').innerText = formattedDate;
+
+            }, err => {
+                console.error("เกิดข้อผิดพลาดในการรับข้อมูล Real-time: ", err);
+            });
+        }
+
+        function triggerForceLogout(title, text) {
+            if(currentSessionListener) currentSessionListener(); // ยกเลิกการดึงข้อมูล
+            localStorage.removeItem('riszy_saved_key');
+            
+            Swal.fire({
+                icon: 'warning',
+                title: title,
+                text: text,
+                confirmButtonColor: '#ff003c',
+                background: '#120a0b',
+                color: '#fff',
+                allowOutsideClick: false
+            }).then(() => {
+                window.location.reload();
+            });
         }
 
         // --- 9. ดึงรายชื่อสคริปต์ฟังก์ชันช่วยเหลือจาก Cloud ---
@@ -782,7 +813,7 @@
             });
         }
 
-        // --- 10. ระบบฉีดสคริปต์และรันตัวเกม (รองรับการระบุประเภทตัวเกม ธรรมดา / MAX) ---
+        // --- 10. ระบบฉีดสคริปต์และรันตัวเกม (กู้คืนส่วนโค้ดที่ขาดหายให้สมบูรณ์) ---
         function injectSystem(gameType) {
             const activatedRadioOption = document.querySelector('input[name="featurePremiumGroup"]:checked');
             
@@ -797,7 +828,6 @@
                 });
             }
 
-            // กำหนดค่าตัวแปรแยกตามเวอร์ชันเกม
             const isMax = (gameType === 'max');
             const gameTitle = isMax ? "Free Fire MAX" : "Free Fire (ธรรมดา)";
             const iosScheme = isMax ? "freefiremax://" : "freefire://";
@@ -814,85 +844,91 @@
                 Swal.fire({
                     background: '#120a0b',
                     color: '#fff',
+                    title: 'กำลังเปิดเข้าเกม...',
+                    text: `ระบบกำลังพาคุณข้ามไปยังหน้าโปรแกรม ${gameTitle}`,
                     icon: 'info',
-                    title: 'ระบบรับรองผู้ใช้งาน iOS',
-                    text: `เปิดใช้งาน: [${activatedRadioOption.value}] เรียบร้อย! สำหรับผู้เล่นไอโฟน ระบบจะนำท่านเปิดเข้าสู่เกม ${gameTitle}`,
-                    confirmButtonColor: '#ff003c',
-                    confirmButtonText: 'รับทราบและเข้าเกมเลย'
-                }).then(() => {
-                    window.location.href = iosScheme;
-                    setTimeout(() => {
-                        window.location.href = iosAppStoreUrl;
-                    }, 1800);
+                    confirmButtonColor: '#ff003c'
                 });
+                window.location.href = iosScheme;
+                setTimeout(() => {
+                    window.location.href = iosAppStoreUrl;
+                }, 2500);
             } else {
                 Swal.fire({
                     background: '#120a0b',
                     color: '#fff',
-                    title: 'กำลังติดตั้งบายพาสข้อมูล...',
-                    text: `ระบบทำการฉีดโค้ดสูตร: ${activatedRadioOption.value} เข้าสู่ตัวเกม ${gameTitle} เรียบร้อยแล้ว`,
-                    timer: 2200,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                    didOpen: () => { Swal.showLoading(); }
-                }).then(() => {
-                    window.location.href = androidIntent;
+                    title: 'ฉีดระบบสำเร็จ!',
+                    text: `กำลังเชื่อมต่อระบบเบื้องหลังและรันเกม ${gameTitle}`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
                 });
+                window.location.href = androidIntent;
             }
         }
 
-        // --- 11. ตรวจเช็คเซสชั่นเก่าคงค้าง ---
-        const autoStoredKeySession = localStorage.getItem('riszy_saved_key');
-        if(autoStoredKeySession) {
-            verifyKeyInDatabase(autoStoredKeySession, true);
-        }
-
-        // ================= [ VISUAL SYSTEM: ANIMATED CANVAS BACKGROUND ] =================
-        const canvasElement = document.getElementById('particleCanvas');
-        const canvasContext = canvasElement.getContext('2d');
-        let arrayParticles = [];
-
-        function autoResizeCanvasSize() {
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight;
-        }
-        window.addEventListener('resize', autoResizeCanvasSize);
-        autoResizeCanvasSize();
-
-        class BackgroundParticleNode {
-            constructor() {
-                this.xPos = Math.random() * canvasElement.width;
-                this.yPos = Math.random() * canvasElement.height;
-                this.sizeRadius = Math.random() * 2.5 + 0.5;
-                this.speedMovementX = Math.random() * 0.4 - 0.2;
-                this.speedMovementY = Math.random() * 0.4 - 0.2;
+        // เช็คล็อกอินอัตโนมัติหากเคยเข้าใช้งานสำเร็จมาก่อน
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('riszy_saved_key');
+            if(savedKey) {
+                document.getElementById('clientKey').value = savedKey;
+                verifyKeyInDatabase(savedKey, true);
             }
-            updateAndDraw() {
-                this.xPos += this.speedMovementX;
-                this.yPos += this.speedMovementY;
-                if(this.xPos < 0 || this.xPos > canvasElement.width) this.speedMovementX *= -1;
-                if(this.yPos < 0 || this.yPos > canvasElement.height) this.speedMovementY *= -1;
+            initParticleBackground(); // รันระบบเอฟเฟกต์พื้นหลัง
+        });
 
-                canvasContext.fillStyle = 'rgba(255, 0, 60, 0.25)';
-                canvasContext.beginPath();
-                canvasContext.arc(this.xPos, this.yPos, this.sizeRadius, 0, Math.PI * 2);
-                canvasContext.fill();
+        // --- 11. ระบบจำลองเอฟเฟกต์เม็ดฝุ่นเนออนแดงวิ่งในพื้นหลัง (Particle Canvas) ---
+        function initParticleBackground() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let particlesArray = [];
+
+            function setCanvasSize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
-        }
+            window.addEventListener('resize', setCanvasSize);
+            setCanvasSize();
 
-        function createParticlesPool() {
-            for(let i = 0; i < 45; i++) {
-                arrayParticles.push(new BackgroundParticleNode());
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.speedY = Math.random() * -0.5 - 0.1;
+                    this.alpha = Math.random() * 0.4 + 0.2;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.y < 0) {
+                        this.y = canvas.height;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.fillStyle = `rgba(255, 0, 60, ${this.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
-        }
-        createParticlesPool();
 
-        function renderCanvasLoop() {
-            canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            arrayParticles.forEach(p => p.updateAndDraw());
-            requestAnimationFrame(renderCanvasLoop);
+            for (let i = 0; i < 45; i++) {
+                particlesArray.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particlesArray.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
         }
-        renderCanvasLoop();
     </script>
 </body>
 </html>
