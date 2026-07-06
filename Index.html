@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RISZY XZIAM -ตัวช่วยเดิมพัน</title>
+    <title>RISZY XZIAM - ตัวช่วยเดิมพัน</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -18,6 +16,7 @@
         /* --- ตัวแปรสไตล์และธีมหลักของเว็บไซต์ (Theme Variables) --- */
         :root {
             --primary-red: #ff003c;
+            --max-gold: #ffaa00;
             --neon-glow: #ff0055;
             --dark-bg: #060303;
             --card-bg: rgba(18, 10, 11, 0.93);
@@ -48,7 +47,6 @@
             border-radius: 10px;
         }
 
-        /* --- สไตล์สำหรับโครงสร้างพื้นหลังและหน้าจอหลัก --- */
         body {
             background: radial-gradient(circle at center, #2b050c 0%, var(--dark-bg) 100%);
             color: #ffffff;
@@ -61,7 +59,6 @@
             position: relative;
         }
 
-        /* แคนวาสสำหรับแสดงเอฟเฟกต์อนุภาควิ่งบนพื้นหลัง */
         #particleCanvas {
             position: absolute;
             top: 0;
@@ -79,13 +76,12 @@
             background: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 0, 60, 0.15);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 10;
             position: relative;
-            transform: translateY(0);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -94,10 +90,9 @@
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 0, 60, 0.25);
         }
 
-        /* --- หัวข้อหลักและการตกแต่ง UI โลโก้ --- */
         .brand-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .brand-header h1 {
@@ -125,7 +120,60 @@
             box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);
         }
 
-        /* --- การ์ดแจ้งเตือนและข้อต้อนรับ (Notice Card) --- */
+        /* --- ระบบเมนูแยกหน้า (Tab Navigation) --- */
+        .navigation-bar {
+            display: flex;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .nav-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            padding: 10px 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab-btn i {
+            font-size: 1.1rem;
+        }
+
+        .nav-tab-btn.active {
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.2) 0%, rgba(255, 0, 60, 0.05) 100%);
+            color: #fff;
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            text-shadow: 0 0 8px var(--primary-red);
+        }
+
+        /* กล่องเนื้อหาหน้าย่อย */
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- สไตล์กล่องอินพุตและส่วนประกอบ UI --- */
         .welcome-notice {
             background: linear-gradient(145deg, rgba(255, 0, 60, 0.12) 0%, rgba(15, 5, 7, 0.6) 100%);
             border-left: 4px solid var(--primary-red);
@@ -137,11 +185,8 @@
             color: #e0e0e0;
         }
 
-        .welcome-notice strong {
-            color: #fff;
-        }
+        .welcome-notice strong { color: #fff; }
 
-        /* --- สไตล์กล่องอินพุตและฟิลด์กรอกข้อมูล --- */
         .input-group {
             position: relative;
             margin-bottom: 20px;
@@ -180,7 +225,7 @@
             text-shadow: 0 0 8px var(--primary-red);
         }
 
-        /* --- สไตล์การออกแบบปุ่มระบบหลัก --- */
+        /* --- ปุ่มระบบหลัก --- */
         .btn {
             width: 100%;
             padding: 14px;
@@ -210,8 +255,25 @@
             transform: translateY(-2px);
         }
 
-        .btn-submit:active {
-            transform: translateY(1px);
+        /* ปุ่มเริ่มเกมเวอร์ชันต่างๆ */
+        .btn-game-normal {
+            background: linear-gradient(90deg, #b3002d 0%, #ff003c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.3);
+        }
+        .btn-game-normal:hover {
+            box-shadow: 0 6px 20px rgba(255, 0, 60, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-game-max {
+            background: linear-gradient(90deg, #c78100 0%, var(--max-gold) 100%);
+            color: black;
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+        }
+        .btn-game-max:hover {
+            box-shadow: 0 6px 20px rgba(255, 170, 0, 0.5);
+            transform: translateY(-2px);
         }
 
         .btn-facebook {
@@ -221,15 +283,14 @@
             font-size: 0.9rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .btn-facebook:hover {
             box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);
             transform: translateY(-2px);
         }
 
-        /* --- แดชบอร์ดข้อมูลผู้ใช้หลังเข้าสู่ระบบสำเร็จ --- */
+        /* --- แดชบอร์ดข้อมูลผู้ใช้หลังเข้าสู่ระบบ --- */
         .user-dashboard {
-            display: none; /* ซ่อนไว้ก่อนล็อกอิน */
+            display: none;
         }
 
         .profile-status-box {
@@ -237,7 +298,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 16px;
             border-radius: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .status-row {
@@ -249,14 +310,8 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
 
-        .status-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .status-row:first-child {
-            padding-top: 0;
-        }
+        .status-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .status-row:first-child { padding-top: 0; }
 
         .label-text {
             color: var(--text-gray);
@@ -266,13 +321,12 @@
         }
 
         .val-uid {
-            color: #ffaa00;
+            color: var(--max-gold);
             font-family: monospace;
             font-size: 0.95rem;
             font-weight: bold;
         }
 
-        /* เมนูนับเวลาถอยหลังการหมดอายุคีย์ระดับพรีเมียม */
         .countdown-container {
             background: linear-gradient(135deg, rgba(0, 255, 102, 0.04) 0%, rgba(0, 0, 0, 0.6) 100%);
             border: 1px solid rgba(0, 255, 102, 0.2);
@@ -300,7 +354,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* --- รายการฟังก์ชันตัวช่วยเล่น (Features Area) --- */
+        /* --- ฟังก์ชันช่วยเหลือเล้น --- */
         .features-header-title {
             font-size: 0.9rem;
             color: #fff;
@@ -316,7 +370,7 @@
             max-height: 240px;
             overflow-y: auto;
             padding-right: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .feature-card-item {
@@ -343,29 +397,17 @@
             gap: 12px;
         }
 
-        .feature-info i {
-            color: var(--primary-red);
-            font-size: 1.1rem;
-        }
+        .feature-info i { color: var(--primary-red); font-size: 1.1rem; }
+        .feature-name-txt { font-size: 0.92rem; font-weight: 500; color: #f0f0f0; }
 
-        .feature-name-txt {
-            font-size: 0.92rem;
-            font-weight: 500;
-            color: #f0f0f0;
-        }
-
-        /* --- สวิตช์ปุ่มวิทยุ (Radio Toggle System) บังคับเปิดได้แค่อันเดียว --- */
+        /* --- Radio Toggle Switch --- */
         .radio-switch-wrapper {
             position: relative;
             width: 46px;
             height: 24px;
         }
 
-        .radio-switch-wrapper input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .radio-switch-wrapper input { opacity: 0; width: 0; height: 0; }
 
         .radio-switch-slider {
             position: absolute;
@@ -401,7 +443,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
         }
 
-        /* --- คำเตือนระบบปฏิบัติการเด่นชัด --- */
         .ios-notice-box {
             background: rgba(255, 170, 0, 0.08);
             border: 1px dashed rgba(255, 170, 0, 0.3);
@@ -413,7 +454,6 @@
             line-height: 1.5;
         }
 
-        /* ข้อความแจ้งเตือนกรณีไม่มีฟังก์ชันถูกเพิ่มเข้ามา */
         .empty-features-fallback {
             text-align: center;
             padding: 20px 0;
@@ -435,7 +475,7 @@
 
         <div class="auth-screen" id="loginScreen">
             <div class="welcome-notice">
-                <i class="fa-solid incentive fa-circle-info" style="color:var(--primary-red); margin-right:5px;"></i>
+                <i class="fa-solid fa-circle-info" style="color:var(--primary-red); margin-right:5px;"></i>
                 <strong>ยินดีต้อนรับเข้าสู่ RISZY XZIAM!</strong><br>
                 หากคุณยังไม่ได้เปิดใช้บริการ กรุณากดปุ่มด้านล่างเพื่อติดต่อแอดมินเพื่อลงทะเบียนรับคีย์ส่วนตัวของคุณเข้าใช้งานระบบ
             </div>
@@ -456,41 +496,62 @@
 
         <div class="user-dashboard" id="dashboardScreen">
             
-            <div class="profile-status-box">
-                <div class="status-row">
-                    <span class="label-text"><i class="fa-solid fa-fingerprint"></i> รหัสลูกค้าเฉพาะเครื่อง (Device ID):</span>
-                    <span id="deviceIdDisplay" class="val-uid">ID-000000</span>
+            <div class="navigation-bar">
+                <button class="nav-tab-btn active" onclick="switchTab('statusTab', this)">
+                    <i class="fa-solid fa-user-shield"></i> สถานะ
+                </button>
+                <button class="nav-tab-btn" onclick="switchTab('featuresTab', this)">
+                    <i class="fa-solid fa-sliders"></i> ฟังก์ชัน
+                </button>
+                <button class="nav-tab-btn" onclick="switchTab('launchTab', this)">
+                    <i class="fa-solid fa-gamepad"></i> เข้าเล่นเกม
+                </button>
+            </div>
+
+            <div id="statusTab" class="tab-panel active">
+                <div class="profile-status-box">
+                    <div class="status-row">
+                        <span class="label-text"><i class="fa-solid fa-fingerprint"></i> Device ID:</span>
+                        <span id="deviceIdDisplay" class="val-uid">ID-000000</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label-text"><i class="fa-solid fa-shield-halved"></i> การเชื่อมต่อ:</span>
+                        <span style="color:var(--success-green); font-weight:600;"><i class="fa-solid fa-circle-check"></i> ปลอดภัย</span>
+                    </div>
+
+                    <div class="countdown-container">
+                        <div class="countdown-title"><i class="fa-regular fa-clock"></i> ระยะเวลาคงเหลือ</div>
+                        <div id="expireCountdownDisplay" class="countdown-timer">00 วัน 00 ชม. 00 น. 00 ว.</div>
+                    </div>
                 </div>
-                <div class="status-row" style="border:none;">
-                    <span class="label-text"><i class="fa-solid fa-shield-halved"></i> สถานะการเชื่อมต่อ:</span>
-                    <span style="color:var(--success-green); font-weight:600;"><i class="fa-solid fa-circle-check"></i> เซิร์ฟเวอร์ปลอดภัย</span>
+            </div>
+
+            <div id="featuresTab" class="tab-panel">
+                <div class="features-header-title">
+                    <i class="fa-solid fa-crosshairs"></i> รายการระบบช่วยเดิมพัน
+                </div>
+                <div class="feature-list-box" id="featuresContainer">
+                    <div class="empty-features-fallback">กำลังโหลดรายการระบบจากคลาวด์...</div>
+                </div>
+            </div>
+
+            <div id="launchTab" class="tab-panel">
+                <div class="ios-notice-box">
+                    <i class="fa-solid fa-mobile-screen-button" style="margin-right: 4px;"></i> 
+                    <strong>คำแนะนำสำหรับผู้ใช้ iOS / iPhone:</strong><br>
+                    หากเกมไม่เปิดขึ้นมาอัตโนมัติ ให้กดเข้าตัวเกมผ่าน App Store ตามปกติหลังจากเปิดฟังก์ชันแล้ว ระบบจะประมวลผลอยู่เบื้องหลังครับ
                 </div>
 
-                <div class="countdown-container">
-                    <div class="countdown-title"><i class="fa-regular fa-clock"></i> ระยะเวลาใช้งานคีย์พรีเมียมคงเหลือ</div>
-                    <div id="expireCountdownDisplay" class="countdown-timer">00 วัน 00 ชม. 00 น. 00 ว.</div>
-                </div>
+                <button class="btn btn-game-normal" onclick="injectSystem('normal')">
+                    <i class="fa-solid fa-circle-play"></i> เข้าสู่ Free Fire (ธรรมดา)
+                </button>
+
+                <button class="btn btn-game-max" onclick="injectSystem('max')">
+                    <i class="fa-solid fa-bolt"></i>เข้าสู่ Free Fire MAX
+                </button>
             </div>
 
-            <div class="ios-notice-box">
-                <i class="fa-solid fa-mobile-screen-button" style="margin-right: 4px;"></i> 
-                <strong>คำแนะนำพิเศษสำหรับผู้ใช้ iOS / iPhone:</strong><br>
-                หลังจากกดปุ่มรันตัวช่วยเล่นด้านล่าง ระบบจะเชื่อมต่อผ่านเว็บเบราว์เซอร์ หากตัวเกมไม่เด้งเข้าอัตโนมัติ ให้เข้าเกมผ่าน App Store ตามปกติ ระบบช่วยจึงจะทำงาน
-            </div>
-
-            <div class="features-header-title">
-                <i class="fa-solid fa-sliders"></i> แผงเลือกฟังก์ชันตัวช่วยเล่น 
-            </div>
-            
-            <div class="feature-list-box" id="featuresContainer">
-                <div class="empty-features-fallback">กำลังโหลดรายการระบบจากคลาวด์...</div>
-            </div>
-
-            <button class="btn btn-submit" style="margin-top: 15px;" onclick="injectSystem()">
-                <i class="fa-solid fa-circle-play"></i> รันระบบตัวช่วยเล่นและเข้าเกม
-            </button>
-            
-            <a href="#" id="contactBtn2" class="btn btn-facebook" style="background: linear-gradient(135deg, #2b2d31 0%, #1e1f22 100%);" target="_blank">
+            <a href="#" id="contactBtn2" class="btn btn-facebook" style="background: linear-gradient(135deg, #2b2d31 0%, #1e1f22 100%); margin-top: 15px;" target="_blank">
                 <i class="fa-solid fa-headset"></i> รายงานปัญหา / แจ้งเรื่องแก่แอดมิน
             </a>
         </div>
@@ -509,22 +570,31 @@
             measurementId: "G-1YNH71SD69"
         };
         
-        // เริ่มต้นการเชื่อมต่อฐานข้อมูล
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ตัวแปรส่วนกลางสำหรับดูแลระบบนับถอยหลัง
         let countdownIntervalId = null;
 
-        // --- 2. ฟังก์ชันตรวจสอบสิทธิ์และสร้างสิทธิ์จำเพาะประจำตัวเครื่องผู้เล่น (Device hardware Identification ID) ---
+        // --- 2. ฟังก์ชันสลับหน้าต่างแท็บเมนูย่อย ---
+        function switchTab(tabId, buttonElement) {
+            // ซ่อนแท็บทั้งหมด
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            // เอาคลาสปุ่ม active ออกทั้งหมด
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // เปิดแสดงแท็บและปุ่มที่ถูกเลือก
+            document.getElementById(tabId).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+
+        // --- 3. ฟังก์ชันสุ่มรหัสเครื่องผู้ใช้ประจำเครื่อง ---
         let myDeviceId = localStorage.getItem('riszy_device_id');
         if(!myDeviceId) {
-            // หากระบบไม่เคยสร้างรหัสขึ้นมา จะทำการสุ่มขึ้นมาใหม่เป็นหลักฐานผูกมัดเครื่อง
             myDeviceId = 'RISZY-ID-' + Math.floor(Math.random() * 900000 + 100000);
             localStorage.setItem('riszy_device_id', myDeviceId);
         }
 
-        // --- 3. ฟังก์ชันดึงลิงก์ช่องทางติดต่อแอดมินจากหลังบ้านผ่านการทำงานแบบสตรีมมิ่งสด ---
+        // --- 4. ดึงลิงก์แอดมินจากระบบฐานข้อมูล ---
         function initializeAdminContactLinks() {
             db.collection("settings").doc("general").onSnapshot(doc => {
                 if(doc.exists && doc.data().facebookLink) {
@@ -538,7 +608,7 @@
         }
         initializeAdminContactLinks();
 
-        // --- 4. ฟังก์ชันการเข้าสู่ระบบและแกะกล่องคีย์ตรวจสอบสิทธิ์ผู้ใช้งานอย่างเข้มงวด ---
+        // --- 5. ฟังก์ชันการเข้าสู่ระบบคีย์สิทธิ์การใช้งาน ---
         function loginWithKey() {
             const userInputKey = document.getElementById('clientKey').value.trim();
             if(!userInputKey) {
@@ -552,7 +622,6 @@
                 });
             }
             
-            // แสดงหน้าโหลดหมุนสีแดงสวยงามระหว่างประมวลผลเซิร์ฟเวอร์
             Swal.fire({
                 title: 'กำลังเชื่อมต่อเซิร์ฟเวอร์...',
                 text: 'กรุณารอสักครู่ ระบบกำลังคัดกรองและตรวจสอบความถูกต้องของคีย์',
@@ -563,7 +632,7 @@
             verifyKeyInDatabase(userInputKey, false);
         }
 
-        // --- 5. ฟังก์ชันแกนหลักในการวิเคราะห์สถานะคีย์และป้องกันการนำคีย์ไปแชร์สลับเครื่องใช้ ---
+        // --- 6. ตรวจสอบเงื่อนไขความปลอดภัยและผูกเครื่อง ---
         function verifyKeyInDatabase(key, isSessionAutoLogin) {
             db.collection("keys").doc(key).get().then(doc => {
                 if(!doc.exists) {
@@ -585,9 +654,7 @@
                 const keyData = doc.data();
                 const currentServerTimestamp = new Date().getTime();
 
-                // เคสที่ 1: คีย์นี้เป็นคีย์ใหม่เอี่ยม ยังไม่เคยถูกใช้กับเครื่องใดๆ เลย (Unused Status)
                 if(keyData.status === "unused") {
-                    // คำนวณวันหมดอายุจริงนับตั้งแต่วินาทีแรกที่กดล็อกอินเข้าสู่ระบบ
                     const calculatedExpiryTime = currentServerTimestamp + (keyData.days * 24 * 60 * 60 * 1000);
                     
                     db.collection("keys").doc(key).update({
@@ -600,9 +667,7 @@
                         Swal.fire('เกิดข้อผิดพลาดในการบันทึกสิทธิ์', err.message, 'error');
                     });
                 } 
-                // เคสที่ 2: คีย์นี้ได้ผ่านการลงทะเบียนใช้งานแล้ว (Used Status)
                 else if (keyData.status === "used") {
-                    // ตรวจสอบความสอดคล้องของเครื่องผู้ใช้งาน เพื่อบล็อคระบบการใช้คีย์วนซ้ำหลายไอดี
                     if(keyData.deviceId !== myDeviceId) {
                         Swal.close();
                         Swal.fire({
@@ -617,7 +682,6 @@
                         return;
                     }
 
-                    // ตรวจสอบระยะเวลาการใช้งานว่าขาดไปแล้วหรือยัง
                     if(currentServerTimestamp > keyData.expiresAt) {
                         Swal.close();
                         Swal.fire({
@@ -632,7 +696,6 @@
                         return;
                     }
 
-                    // ผ่านทุกเงื่อนไขความปลอดภัย ยินยอมให้เข้าถึงระบบช่วยเหลือการเล่น
                     executeSuccessfulLogin(key, keyData.expiresAt);
                 }
             }).catch(error => {
@@ -642,26 +705,20 @@
             });
         }
 
-        // --- 6. ฟังก์ชันจัดการเมื่อเข้าสู่ระบบได้สมบูรณ์แบบและการเปลี่ยนสถานะการแสดงหน้าจอ ---
+        // --- 7. เปลี่ยนการแสดงผลหลังล็อกอินผ่าน ---
         function executeSuccessfulLogin(verifiedKey, expiresAtTime) {
             Swal.close();
             localStorage.setItem('riszy_saved_key', verifiedKey);
             
-            // ใช้เทคนิคสลับการซ่อนการ์ดความคุม (CSS Tab Switching)
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
-            
-            // แสดงเลขเครื่องระบุตัวตนประจำลูกค้า
             document.getElementById('deviceIdDisplay').innerText = myDeviceId;
 
-            // รันการนับถอยหลังบอกเวลาแบบเรียลไทม์ วินาทีต่อวินาที
             startLiveExpirationCountdown(expiresAtTime);
-            
-            // โหลดโมดูลฟังก์ชันโกงเกมสดๆ จากฐานข้อมูลหลังบ้าน
             renderCloudFeaturesList();
         }
 
-        // --- 7. เมนูฟังก์ชันคำนวณนับถอยหลังบอกวันเวลาเหลือคีย์อย่างละเอียดแม่นยำ ---
+        // --- 8. ระบบนับเวลาถอยหลังอายุคีย์ ---
         function startLiveExpirationCountdown(targetTimestamp) {
             if(countdownIntervalId) clearInterval(countdownIntervalId);
 
@@ -678,13 +735,11 @@
                     return;
                 }
 
-                // สลายสูตรคำนวณเพื่อแปลงค่าตัวเลขเป็นสัดส่วน วัน, ชั่วโมง, นาที, วินาที ให้ scannable ง่าย
                 const daysCalculated = Math.floor(distanceTime / (1000 * 60 * 60 * 24));
                 const hoursCalculated = Math.floor((distanceTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutesCalculated = Math.floor((distanceTime % (1000 * 60 * 60)) / (1000 * 60));
                 const secondsCalculated = Math.floor((distanceTime % (1000 * 60)) / 1000);
 
-                // พ่นข้อมูลลง Element เพื่อให้ลูกค้าดูเวลาหมดได้อย่างชัดเจนที่สุด
                 document.getElementById('expireCountdownDisplay').innerText = 
                     `${daysCalculated} วัน ${hoursCalculated} ชม. ${minutesCalculated} น. ${secondsCalculated} ว.`;
             }
@@ -693,7 +748,7 @@
             countdownIntervalId = setInterval(updateTimerString, 1000);
         }
 
-        // --- 8. ฟังก์ชันการแสดงการ์ดรายการและปุ่มเปิดใช้งาน (สลับวิทยุ บังคับจำกัด 1 อันเท่านั้น!) ---
+        // --- 9. ดึงรายชื่อสคริปต์ฟังก์ชันช่วยเหลือจาก Cloud ---
         function renderCloudFeaturesList() {
             const container = document.getElementById('featuresContainer');
             
@@ -705,10 +760,8 @@
                     return;
                 }
 
-                // ทยอยเรนเดอร์ไอเท็มฟังก์ชันออกมาจากฐานข้อมูลโดยใช้โครงสร้าง Radio Group ป้องกันเปิดซ้อน
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    
                     const itemHtmlStr = `
                         <div class="feature-card-item">
                             <div class="feature-info">
@@ -724,66 +777,71 @@
                     container.innerHTML += itemHtmlStr;
                 });
             }, err => {
-                console.error("ไม่สามารถฟังความเปลี่ยนแปลงของฟังก์ชันได้: ", err);
+                console.error("ไม่สามารถโหลดข้อมูลฟังก์ชันได้: ", err);
                 container.innerHTML = '<div class="empty-features-fallback" style="color:red;">การโหลดข้อมูลฟังก์ชันขัดข้อง</div>';
             });
         }
 
-        // --- 9. ฟังก์ชันปุ่มรันตัวช่วยเล่นหลัก และระบบการดักตรวจจับอุปกรณ์ iOS / iPhone ---
-        function injectSystem() {
+        // --- 10. ระบบฉีดสคริปต์และรันตัวเกม (รองรับการระบุประเภทตัวเกม ธรรมดา / MAX) ---
+        function injectSystem(gameType) {
             const activatedRadioOption = document.querySelector('input[name="featurePremiumGroup"]:checked');
             
-            // กรณีลูกค้าไม่ได้ทำการเปิดปุ่มฟังก์ชันใดๆ เลย
             if(!activatedRadioOption) {
                 return Swal.fire({
                     background: '#120a0b',
                     color: '#fff',
                     icon: 'warning',
                     title: 'ยังไม่ได้เลือกฟังก์ชัน!',
-                    text: 'กรุณาทำการเลือกเปิดฟังก์ชันตัวช่วยเล่นที่คุณต้องการใช้อย่างน้อย 1 ระบบครับก่อนจะสั่งรันเข้าสู่ตัวเกม',
+                    text: 'กรุณาไปที่แท็บ "ฟังก์ชัน" เพื่อเลือกเปิดระบบตัวช่วยที่คุณต้องการสั่งรันก่อนครับ',
                     confirmButtonColor: '#ff003c'
                 });
             }
 
-            // ตรวจหาว่าเป็นผู้ใช้ระบบปฏิบัติการ iPhone / iPad หรือไม่
+            // กำหนดค่าตัวแปรแยกตามเวอร์ชันเกม
+            const isMax = (gameType === 'max');
+            const gameTitle = isMax ? "Free Fire MAX" : "Free Fire (ธรรมดา)";
+            const iosScheme = isMax ? "freefiremax://" : "freefire://";
+            const androidIntent = isMax 
+                ? "intent://#Intent;package=com.dts.freefiremax;scheme=freefiremax;end;"
+                : "intent://#Intent;package=com.dts.freefireth;scheme=freefire;end;";
+            const iosAppStoreUrl = isMax
+                ? "https://apps.apple.com/th/app/garena-free-fire-max/id1480516829"
+                : "https://apps.apple.com/th/app/garena-free-fire/id1300146617";
+
             const checkIsAppleIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
             if(checkIsAppleIOS) {
-                // หากตรวจพบว่าเป็นไอโฟนตามเงื่อนไขที่สั่ง จะแสดงขั้นตอนอธิบายกล่องโต้ตอบการรันแอปพลิเคชันพิเศษ
                 Swal.fire({
                     background: '#120a0b',
                     color: '#fff',
                     icon: 'info',
                     title: 'ระบบรับรองผู้ใช้งาน iOS',
-                    text: `เปิดใช้งาน: [${activatedRadioOption.value}] เรียบร้อย! สำหรับผู้เล่นไอโฟนตัวเกมจะเปิดสลับอัตโนมัติหรือสามารถเข้าเกมโดยตรงผ่านแอปสโตร์ App Store ได้ทันทีเพื่อรับการหนุนตัวช่วยสคริปต์ในระบบเบื้องหลัง`,
+                    text: `เปิดใช้งาน: [${activatedRadioOption.value}] เรียบร้อย! สำหรับผู้เล่นไอโฟน ระบบจะนำท่านเปิดเข้าสู่เกม ${gameTitle}`,
                     confirmButtonColor: '#ff003c',
                     confirmButtonText: 'รับทราบและเข้าเกมเลย'
                 }).then(() => {
-                    // ลิงก์สำหรับการเด้งเปิดแอปปลายทางสากลบนแพลตฟอร์ม iOS
-                    window.location.href = "freefire://";
+                    window.location.href = iosScheme;
                     setTimeout(() => {
-                        // หากไม่มีตัวเกมในเครื่องให้ไปหน้าดาวน์โหลดหลัก
-                        window.location.href = "https://apps.apple.com/th/app/garena-free-fire/id1300146617";
+                        window.location.href = iosAppStoreUrl;
                     }, 1800);
                 });
             } else {
-                // สำหรับระบบปฏิบัติการทั่วไป หรือแอนดรอยด์ทำงานผ่านกลไก Intent Link ปกติ
                 Swal.fire({
                     background: '#120a0b',
                     color: '#fff',
                     title: 'กำลังติดตั้งบายพาสข้อมูล...',
-                    text: `ระบบทำการฉีดโค้ดสูตร: ${activatedRadioOption.value} เข้าสู่ตัวระบบเรียบร้อยแล้ว`,
+                    text: `ระบบทำการฉีดโค้ดสูตร: ${activatedRadioOption.value} เข้าสู่ตัวเกม ${gameTitle} เรียบร้อยแล้ว`,
                     timer: 2200,
                     timerProgressBar: true,
                     showConfirmButton: false,
                     didOpen: () => { Swal.showLoading(); }
                 }).then(() => {
-                    window.location.href = "intent://#Intent;package=com.dts.freefireth;scheme=freefire;end;";
+                    window.location.href = androidIntent;
                 });
             }
         }
 
-        // --- 10. ระบบการตรวจสอบเซสชั่นตรวจสอบสิทธิ์คงค้าง (Auto-Login Session Monitor) ---
+        // --- 11. ตรวจเช็คเซสชั่นเก่าคงค้าง ---
         const autoStoredKeySession = localStorage.getItem('riszy_saved_key');
         if(autoStoredKeySession) {
             verifyKeyInDatabase(autoStoredKeySession, true);
@@ -807,41 +865,34 @@
                 this.yPos = Math.random() * canvasElement.height;
                 this.sizeRadius = Math.random() * 2.5 + 0.5;
                 this.speedMovementX = Math.random() * 0.4 - 0.2;
-                this.speedMovementY = Math.random() * 0.5 + 0.1;
-                this.opacityValue = Math.random() * 0.5 + 0.1;
+                this.speedMovementY = Math.random() * 0.4 - 0.2;
             }
-            updateFramePosition() {
+            updateAndDraw() {
                 this.xPos += this.speedMovementX;
                 this.yPos += this.speedMovementY;
-                if(this.yPos > canvasElement.height) {
-                    this.yPos = -10;
-                    this.xPos = Math.random() * canvasElement.width;
-                }
-            }
-            drawShape() {
+                if(this.xPos < 0 || this.xPos > canvasElement.width) this.speedMovementX *= -1;
+                if(this.yPos < 0 || this.yPos > canvasElement.height) this.speedMovementY *= -1;
+
+                canvasContext.fillStyle = 'rgba(255, 0, 60, 0.25)';
                 canvasContext.beginPath();
                 canvasContext.arc(this.xPos, this.yPos, this.sizeRadius, 0, Math.PI * 2);
-                canvasContext.fillStyle = `rgba(255, 0, 60, ${this.opacityValue})`;
                 canvasContext.fill();
             }
         }
 
-        function createParticlePoolStructure() {
-            for(let loopCount = 0; loopCount < 55; loopCount++) {
+        function createParticlesPool() {
+            for(let i = 0; i < 45; i++) {
                 arrayParticles.push(new BackgroundParticleNode());
             }
         }
-        createParticlePoolStructure();
+        createParticlesPool();
 
-        function runAnimationLoopSequence() {
+        function renderCanvasLoop() {
             canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            for(let elementIndex = 0; elementIndex < arrayParticles.length; elementIndex++) {
-                arrayParticles[elementIndex].updateFramePosition();
-                arrayParticles[elementIndex].drawShape();
-            }
-            requestAnimationFrame(runAnimationLoopSequence);
+            arrayParticles.forEach(p => p.updateAndDraw());
+            requestAnimationFrame(renderCanvasLoop);
         }
-        runAnimationLoopSequence();
+        renderCanvasLoop();
     </script>
 </body>
 </html>
