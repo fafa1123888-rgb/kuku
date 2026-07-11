@@ -1,934 +1,968 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RISZY XZIAM - ตัวช่วยเดิมพัน</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    
-    <style>
-        /* --- ตัวแปรสไตล์และธีมหลักของเว็บไซต์ (Theme Variables) --- */
-        :root {
-            --primary-red: #ff003c;
-            --max-gold: #ffaa00;
-            --neon-glow: #ff0055;
-            --dark-bg: #060303;
-            --card-bg: rgba(18, 10, 11, 0.93);
-            --border-color: rgba(255, 0, 60, 0.35);
-            --text-gray: #b3b3b3;
-            --success-green: #00ff66;
-        }
-
-        /* --- การตั้งค่าพื้นฐานสำหรับองค์ประกอบทั้งหมด --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'Mitr', sans-serif;
-        }
-
-        /* --- สไตล์ของแถบเลื่อนความคมชัดสูง (Custom Scrollbar) --- */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 10px;
-        }
-
-        body {
-            background: radial-gradient(circle at center, #2b050c 0%, var(--dark-bg) 100%);
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* --- โครงสร้างกล่องควบคุมระบบกลาง (Main Container) --- */
-        .main-wrapper {
-            width: 100%;
-            max-width: 430px;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 0, 60, 0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 10;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .main-wrapper:hover {
-            border-color: rgba(255, 0, 60, 0.6);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 0, 60, 0.25);
-        }
-
-        .brand-header {
+<!DOCTYPE html><html lang="th"><head>    
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>RISZY XZIAM - ตัวช่วยเดิมพัน</title>        
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">        
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>        
+    <style>        
+        /* --- ตัวแปรสไตล์และธีมหลักของเว็บไซต์ (Theme Variables) --- */        
+        :root {            
+            --primary-red: #ff003c;            
+            --max-gold: #ffaa00;            
+            --neon-glow: #ff0055;            
+            --dark-bg: #060303;            
+            --card-bg: rgba(18, 10, 11, 0.93);            
+            --border-color: rgba(255, 0, 60, 0.35);            
+            --text-gray: #b3b3b3;            
+            --success-green: #00ff66;        
+        }        
+        /* --- การตั้งค่าพื้นฐานสำหรับองค์ประกอบทั้งหมด --- */        
+        * {            
+            box-sizing: border-box;            
+            margin: 0;            
+            padding: 0;            
+            user-select: none;            
+            -webkit-user-select: none;            
+            font-family: 'Mitr', sans-serif;        
+        }        
+        /* --- สไตล์ของแถบเลื่อนความคมชัดสูง (Custom Scrollbar) --- */        
+        ::-webkit-scrollbar {            
+            width: 6px;        
+        }        
+        ::-webkit-scrollbar-track {            
+            background: var(--dark-bg);        
+        }        
+        ::-webkit-scrollbar-thumb {            
+            background: var(--primary-red);            
+            border-radius: 10px;        
+        }        
+        body {            
+            background: radial-gradient(circle at center, #2b050c 0%, var(--dark-bg) 100%);            
+            color: #ffffff;            
+            min-height: 100vh;            
+            display: flex;            
+            justify-content: center;            
+            align-items: center;            
+            padding: 20px;            
+            overflow-x: hidden;            
+            position: relative;        
+        }        
+        #particleCanvas {            
+            position: absolute;            
+            top: 0;            
+            left: 0;            
+            width: 100%;            
+            height: 100%;            
+            z-index: 1;            
+            pointer-events: none;        
+        }        
+        /* --- โครงสร้างกล่องควบคุมระบบกลาง (Main Container) --- */        
+        .main-wrapper {            
+            width: 100%;            
+            max-width: 430px;            
+            background: var(--card-bg);            
+            border: 2px solid var(--border-color);            
+            border-radius: 24px;            
+            padding: 25px;            
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 0, 60, 0.15);            
+            backdrop-filter: blur(15px);            
+            -webkit-backdrop-filter: blur(15px);            
+            z-index: 10;            
+            position: relative;            
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);        
+        }        
+        .main-wrapper:hover {            
+            border-color: rgba(255, 0, 60, 0.6);            
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 0, 60, 0.25);        
+        }        
+        .brand-header {            
+            text-align: center;            
+            margin-bottom: 15px;        
+        }        
+        .brand-header h1 {            
+            font-size: 1.8rem;            
+            color: #fff;            
+            text-transform: uppercase;            
+            letter-spacing: 2px;            
+            font-weight: 700;            
+            background: linear-gradient(135deg, #ffffff 0%, #ff6685 50%, var(--primary-red) 100%);            
+            -webkit-background-clip: text;            
+            -webkit-text-fill-color: transparent;            
+            text-shadow: 0 0 15px rgba(255, 0, 60, 0.4);        
+        }        
+        .brand-header .badge-version {            
+            display: inline-block;            
+            background: rgba(255, 0, 60, 0.2);            
+            border: 1px solid var(--primary-red);            
+            color: var(--primary-red);            
+            font-size: 0.7rem;            
+            padding: 2px 10px;            
+            border-radius: 20px;            
+            margin-top: 5px;            
+            font-weight: 600;            
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);        
+        }        
+        /* --- ระบบกล่องประกาศจากแอดมิน (Announcement Box) --- */        
+        .announcement-box {            
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(10, 6, 0, 0.8) 100%);            
+            border: 1px solid rgba(255, 170, 0, 0.3);            
+            border-radius: 14px;            
+            padding: 12px 15px;            
+            margin-bottom: 20px;            
+            display: flex;            
+            gap: 12px;            
+            align-items: flex-start;        
+        }        
+        .announcement-box i {            
+            color: var(--max-gold);            
+            font-size: 1.2rem;            
+            margin-top: 2px;            
+            animation: pulse-gold 2s infinite;        
+        }        
+        .announcement-content {            
+            flex: 1;        
+        }        
+        .announcement-title {            
+            font-size: 0.85rem;            
+            font-weight: 600;            
+            color: var(--max-gold);            
+            margin-bottom: 3px;            
+            text-transform: uppercase;        
+        }        
+        .announcement-text {            
+            font-size: 0.8rem;            
+            color: #e0e0e0;            
+            line-height: 1.4;        
+        }        
+        @keyframes pulse-gold {            
+            0% { transform: scale(1); opacity: 1; }            
+            50% { transform: scale(1.1); opacity: 0.7; }            
+            100% { transform: scale(1); opacity: 1; }        
+        }        
+        /* 🛠️ หน้าต่างปิดปรับปรุงระบบ (Maintenance Screen Style) */
+        .maintenance-screen {
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .brand-header h1 {
-            font-size: 1.8rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ffffff 0%, #ff6685 50%, var(--primary-red) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(255, 0, 60, 0.4);
-        }
-
-        .brand-header .badge-version {
-            display: inline-block;
-            background: rgba(255, 0, 60, 0.2);
-            border: 1px solid var(--primary-red);
-            color: var(--primary-red);
-            font-size: 0.7rem;
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-top: 5px;
-            font-weight: 600;
-            box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);
-        }
-
-        /* --- ระบบเมนูแยกหน้า (Tab Navigation) --- */
-        .navigation-bar {
-            display: flex;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 5px;
-            margin-bottom: 20px;
-            gap: 5px;
-        }
-
-        .nav-tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-gray);
             padding: 10px 5px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-in-out;
         }
-
-        .nav-tab-btn i {
-            font-size: 1.1rem;
-        }
-
-        .nav-tab-btn.active {
-            background: linear-gradient(135deg, rgba(255, 0, 60, 0.2) 0%, rgba(255, 0, 60, 0.05) 100%);
-            color: #fff;
-            border: 1px solid rgba(255, 0, 60, 0.3);
-            text-shadow: 0 0 8px var(--primary-red);
-        }
-
-        /* กล่องเนื้อหาหน้าย่อย */
-        .tab-panel {
-            display: none;
-        }
-        .tab-panel.active {
-            display: block;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- สไตล์กล่องอินพุตและส่วนประกอบ UI --- */
-        .welcome-notice {
-            background: linear-gradient(145deg, rgba(255, 0, 60, 0.12) 0%, rgba(15, 5, 7, 0.6) 100%);
-            border-left: 4px solid var(--primary-red);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .welcome-notice strong { color: #fff; }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.4);
-            transition: 0.3s;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px 15px 14px 45px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(0, 0, 0, 0.4);
-            color: #ffffff;
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .input-field:focus {
-            border-color: var(--primary-red);
-            background: rgba(15, 5, 7, 0.7);
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .input-field:focus + i {
-            color: var(--primary-red);
-            text-shadow: 0 0 8px var(--primary-red);
-        }
-
-        /* --- ปุ่มระบบหลัก --- */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            margin-bottom: 12px;
-        }
-
-        .btn-submit {
-            background: linear-gradient(90deg, #990022 0%, var(--primary-red) 50%, #ff3366 100%);
-            background-size: 200% auto;
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.4);
-        }
-
-        .btn-submit:hover {
-            background-position: right center;
-            box-shadow: 0 6px 20px rgba(255, 0, 60, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .btn-game-normal {
-            background: linear-gradient(90deg, #b3002d 0%, #ff003c 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.3);
-        }
-        .btn-game-normal:hover {
-            box-shadow: 0 6px 20px rgba(255, 0, 60, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .btn-game-max {
-            background: linear-gradient(90deg, #c78100 0%, var(--max-gold) 100%);
-            color: black;
-            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
-        }
-        .btn-game-max:hover {
-            box-shadow: 0 6px 20px rgba(255, 170, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .btn-facebook {
-            background: linear-gradient(135deg, #1877F2 0%, #135cb4 100%);
-            color: white;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .btn-facebook:hover {
-            box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* --- แดชบอร์ดข้อมูลผู้ใช้หลังเข้าสู่ระบบ --- */
-        .user-dashboard {
-            display: none;
-        }
-
-        .profile-status-box {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 15px;
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.88rem;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .status-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .status-row:first-child { padding-top: 0; }
-
-        .label-text {
-            color: var(--text-gray);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .val-uid {
+        .maintenance-icon {
+            font-size: 3.5rem;
             color: var(--max-gold);
-            font-family: monospace;
-            font-size: 0.95rem;
-            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
+            animation: rotate-gear 4s linear infinite;
         }
-
-        .countdown-container {
-            background: linear-gradient(135deg, rgba(0, 255, 102, 0.04) 0%, rgba(0, 0, 0, 0.6) 100%);
-            border: 1px solid rgba(0, 255, 102, 0.2);
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 15px;
-            text-align: center;
+        @keyframes rotate-gear {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        .countdown-title {
-            font-size: 0.75rem;
-            color: var(--success-green);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+        .maintenance-title {
+            font-size: 1.4rem;
+            color: #fff;
             font-weight: 600;
-        }
-
-        .countdown-timer {
-            font-size: 1.15rem;
-            font-weight: bold;
-            color: var(--success-green);
-            font-family: monospace;
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+            margin-bottom: 10px;
             letter-spacing: 0.5px;
         }
-
-        /* --- ฟังก์ชันช่วยเหลือเล้น --- */
-        .features-header-title {
-            font-size: 0.9rem;
-            color: #fff;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 6px;
-        }
-
-        .feature-list-box {
-            max-height: 240px;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin-bottom: 10px;
-        }
-
-        .feature-card-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 14px 16px;
+        .maintenance-reason-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px dashed rgba(255, 170, 0, 0.4);
             border-radius: 14px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
+            padding: 15px;
+            font-size: 0.9rem;
+            color: #f0f0f0;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .freeze-badge {
+            display: inline-flex;
             align-items: center;
-            transition: all 0.25s ease;
-        }
-
-        .feature-card-item:hover {
-            background: rgba(255, 0, 60, 0.03);
-            border-color: rgba(255, 0, 60, 0.2);
-            transform: scale(0.99);
-        }
-
-        .feature-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .feature-info i { color: var(--primary-red); font-size: 1.1rem; }
-        .feature-name-txt { font-size: 0.92rem; font-weight: 500; color: #f0f0f0; }
-
-        /* --- Radio Toggle Switch --- */
-        .radio-switch-wrapper {
-            position: relative;
-            width: 46px;
-            height: 24px;
-        }
-
-        .radio-switch-wrapper input { opacity: 0; width: 0; height: 0; }
-
-        .radio-switch-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #241618;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 34px;
-            transition: all 0.3s ease;
-        }
-
-        .radio-switch-slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background-color: #666;
-            border-radius: 50%;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .radio-switch-wrapper input:checked + .radio-switch-slider {
-            background-color: var(--primary-red);
-            border-color: transparent;
-            box-shadow: 0 0 10px rgba(255, 0, 60, 0.6);
-        }
-
-        .radio-switch-wrapper input:checked + .radio-switch-slider:before {
-            transform: translateX(22px);
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        .ios-notice-box {
-            background: rgba(255, 170, 0, 0.08);
-            border: 1px dashed rgba(255, 170, 0, 0.3);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: #ffcc66;
+            gap: 6px;
+            background: rgba(0, 255, 102, 0.15);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+            font-size: 0.78rem;
+            padding: 4px 12px;
+            border-radius: 20px;
             margin-bottom: 15px;
-            line-height: 1.5;
+            font-weight: 500;
         }
-
-        .empty-features-fallback {
-            text-align: center;
-            padding: 20px 0;
-            color: var(--text-gray);
-            font-size: 0.85rem;
-        }
-    </style>
-</head>
-<body>
-
+        /* --- ระบบเมนูแยกหน้า (Tab Navigation) --- */        
+        .navigation-bar {            
+            display: flex;            
+            background: rgba(0, 0, 0, 0.6);            
+            border: 1px solid rgba(255, 255, 255, 0.08);            
+            border-radius: 14px;            
+            padding: 5px;            
+            margin-bottom: 20px;            
+            gap: 5px;        
+        }        
+        .nav-tab-btn {            
+            flex: 1;            
+            background: transparent;            
+            border: none;            
+            color: var(--text-gray);            
+            padding: 10px 5px;            
+            font-size: 0.85rem;            
+            font-weight: 500;            
+            cursor: pointer;            
+            border-radius: 10px;            
+            display: flex;            
+            flex-direction: column;            
+            align-items: center;            
+            gap: 4px;            
+            transition: all 0.3s ease;        
+        }        
+        .nav-tab-btn i {            
+            font-size: 1.1rem;        
+        }        
+        .nav-tab-btn.active {            
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.2) 0%, rgba(255, 0, 60, 0.05) 100%);            
+            color: #fff;            
+            border: 1px solid rgba(255, 0, 60, 0.3);            
+            text-shadow: 0 0 8px var(--primary-red);        
+        }        
+        /* กล่องเนื้อหาหน้าย่อย */        
+        .tab-panel {            
+            display: none;        
+        }        
+        .tab-panel.active {            
+            display: block;            
+            animation: fadeIn 0.4s ease-in-out;        
+        }        
+        @keyframes fadeIn {            
+            from { opacity: 0; transform: translateY(5px); }            
+            to { opacity: 1; transform: translateY(0); }        
+        }        
+        /* --- สไตล์กล่องอินพุตและส่วนประกอบ UI --- */        
+        .welcome-notice {            
+            background: linear-gradient(145deg, rgba(255, 0, 60, 0.12) 0%, rgba(15, 5, 7, 0.6) 100%);            
+            border-left: 4px solid var(--primary-red);            
+            padding: 15px;            
+            border-radius: 12px;            
+            margin-bottom: 25px;            
+            font-size: 0.85rem;            
+            line-height: 1.6;            
+            color: #e0e0e0;        
+        }        
+        .welcome-notice strong { color: #fff; }        
+        .input-group {            
+            position: relative;            
+            margin-bottom: 20px;        
+        }        
+        .input-group i {            
+            position: absolute;            
+            left: 15px;            
+            top: 50%;            
+            transform: translateY(-50%);            
+            color: rgba(255, 255, 255, 0.4);            
+            transition: 0.3s;        
+        }        
+        .input-field {            
+            width: 100%;            
+            padding: 14px 15px 14px 45px;            
+            border-radius: 12px;            
+            border: 1px solid rgba(255, 255, 255, 0.08);            
+            background: rgba(0, 0, 0, 0.4);            
+            color: #ffffff;            
+            font-size: 0.95rem;            
+            outline: none;            
+            transition: all 0.3s ease;            
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);        
+        }        
+        .input-field:focus {            
+            border-color: var(--primary-red);            
+            background: rgba(15, 5, 7, 0.7);            
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.5);        
+        }        
+        .input-field:focus + i {            
+            color: var(--primary-red);            
+            text-shadow: 0 0 8px var(--primary-red);        
+        }        
+        /* --- ปุ่มระบบหลัก --- */        
+        .btn {            
+            width: 100%;            
+            padding: 14px;            
+            border-radius: 12px;            
+            border: none;            
+            font-size: 1rem;            
+            font-weight: 600;            
+            cursor: pointer;            
+            display: flex;            
+            justify-content: center;            
+            align-items: center;            
+            gap: 10px;            
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);            
+            margin-bottom: 12px;        
+        }        
+        .btn-submit {            
+            background: linear-gradient(90deg, #990022 0%, var(--primary-red) 50%, #ff3366 100%);            
+            background-size: 200% auto;            
+            color: white;            
+            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.4);        
+        }        
+        .btn-submit:hover {            
+            background-position: right center;            
+            box-shadow: 0 6px 20px rgba(255, 0, 60, 0.6);            
+            transform: translateY(-2px);        
+        }        
+        .btn-game-normal {            
+            background: linear-gradient(90deg, #b3002d 0%, #ff003c 100%);            
+            color: white;            
+            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.3);        
+        }        
+        .btn-game-normal:hover {            
+            box-shadow: 0 6px 20px rgba(255, 0, 60, 0.5);            
+            transform: translateY(-2px);        
+        }        
+        .btn-game-max {            
+            background: linear-gradient(90deg, #c78100 0%, var(--max-gold) 100%);            
+            color: black;            
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);        
+        }        
+        .btn-game-max:hover {            
+            box-shadow: 0 6px 20px rgba(255, 170, 0, 0.5);            
+            transform: translateY(-2px);        
+        }        
+        .btn-facebook {            
+            background: linear-gradient(135deg, #1877F2 0%, #135cb4 100%);            
+            color: white;            
+            text-decoration: none;            
+            font-size: 0.9rem;            
+            border: 1px solid rgba(255, 255, 255, 0.1);        
+        }        
+        .btn-facebook:hover {            
+            box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);            
+            transform: translateY(-2px);        
+        }        
+        /* --- แดชบอร์ดข้อมูลผู้ใช้หลังเข้าสู่ระบบ --- */        
+        .user-dashboard {            
+            display: none;        
+        }        
+        .profile-status-box {            
+            background: rgba(0, 0, 0, 0.5);            
+            border: 1px solid rgba(255, 255, 255, 0.05);            
+            padding: 16px;            
+            border-radius: 16px;            
+            margin-bottom: 15px;        
+        }        
+        .status-row {            
+            display: flex;            
+            justify-content: space-between;            
+            align-items: center;            
+            font-size: 0.88rem;            
+            padding: 8px 0;            
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);        
+        }        
+        .status-row:last-child { border-bottom: none; padding-bottom: 0; }        
+        .status-row:first-child { padding-top: 0; }        
+        .label-text {            
+            color: var(--text-gray);            
+            display: flex;            
+            align-items: center;            
+            gap: 8px;        
+        }        
+        .val-uid {            
+            color: var(--max-gold);            
+            font-family: monospace;            
+            font-size: 0.95rem;            
+            font-weight: bold;        
+        }        
+        .countdown-container {            
+            background: linear-gradient(135deg, rgba(0, 255, 102, 0.04) 0%, rgba(0, 0, 0, 0.6) 100%);            
+            border: 1px solid rgba(0, 255, 102, 0.2);            
+            padding: 12px;            
+            border-radius: 12px;            
+            margin-top: 15px;            
+            text-align: center;        
+        }        
+        .countdown-title {            
+            font-size: 0.75rem;            
+            color: var(--success-green);            
+            text-transform: uppercase;            
+            letter-spacing: 1px;            
+            margin-bottom: 5px;            
+            font-weight: 600;        
+        }        
+        .countdown-timer {            
+            font-size: 1.15rem;            
+            font-weight: bold;            
+            color: var(--success-green);            
+            font-family: monospace;            
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);            
+            letter-spacing: 0.5px;        
+        }        
+        /* --- ฟังก์ชันช่วยเหลือเล้น --- */        
+        .features-header-title {            
+            font-size: 0.9rem;            
+            color: #fff;            
+            margin-bottom: 12px;            
+            display: flex;            
+            align-items: center;            
+            gap: 8px;            
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);            
+            padding-bottom: 6px;        
+        }        
+        .feature-list-box {            
+            max-height: 240px;            
+            overflow-y: auto;            
+            padding-right: 4px;            
+            margin-bottom: 10px;        
+        }        
+        .feature-card-item {            
+            background: rgba(255, 255, 255, 0.02);            
+            border: 1px solid rgba(255, 255, 255, 0.05);            
+            padding: 14px 16px;            
+            border-radius: 14px;            
+            margin-bottom: 10px;            
+            display: flex;            
+            justify-content: space-between;            
+            align-items: center;            
+            transition: all 0.25s ease;        
+        }        
+        .feature-card-item:hover {            
+            background: rgba(255, 0, 60, 0.03);            
+            border-color: rgba(255, 0, 60, 0.2);            
+            transform: scale(0.99);        
+        }        
+        .feature-info {            
+            display: flex;            
+            align-items: center;            
+            gap: 12px;        
+        }        
+        .feature-info i { color: var(--primary-red); font-size: 1.1rem; }        
+        .feature-name-txt { font-size: 0.92rem; font-weight: 500; color: #f0f0f0; }        
+        /* --- Checkbox Toggle Switch --- */        
+        .radio-switch-wrapper {            
+            position: relative;            
+            width: 46px;            
+            height: 24px;        
+        }        
+        .radio-switch-wrapper input { opacity: 0; width: 0; height: 0; }        
+        .radio-switch-slider {            
+            position: absolute;            
+            cursor: pointer;            
+            top: 0; left: 0; right: 0; bottom: 0;            
+            background-color: #241618;            
+            border: 1px solid rgba(255, 255, 255, 0.1);            
+            border-radius: 34px;            
+            transition: all 0.3s ease;        
+        }        
+        .radio-switch-slider:before {            
+            position: absolute;            
+            content: "";            
+            height: 16px;            
+            width: 16px;            
+            left: 3px;            
+            bottom: 3px;            
+            background-color: #666;            
+            border-radius: 50%;            
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);        
+        }        
+        .radio-switch-wrapper input:checked + .radio-switch-slider {            
+            background-color: var(--primary-red);            
+            border-color: transparent;            
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.6);        
+        }        
+        .radio-switch-wrapper input:checked + .radio-switch-slider:before {            
+            transform: translateX(22px);            
+            background-color: #ffffff;            
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);        
+        }        
+        .ios-notice-box {            
+            background: rgba(255, 170, 0, 0.08);            
+            border: 1px dashed rgba(255, 170, 0, 0.3);            
+            padding: 12px;            
+            border-radius: 12px;            
+            font-size: 0.8rem;            
+            color: #ffcc66;            
+            margin-bottom: 15px;            
+            line-height: 1.5;        
+        }        
+        .empty-features-fallback {            
+            text-align: center;            
+            padding: 20px 0;            
+            color: var(--text-gray);            
+            font-size: 0.85rem;        
+        }    
+    </style></head><body>
     <canvas id="particleCanvas"></canvas>
-
-    <div class="main-wrapper">
-        
-        <div class="brand-header">
-            <h1>RISZY XZIAM</h1>
-            <span class="badge-version">RSX V4.12</span>
+    <div class="main-wrapper">                
+        <div class="brand-header">            
+            <h1>RISZY XZIAM</h1>            
+            <span class="badge-version">RSX V5.42</span>        
         </div>
 
-        <div class="auth-screen" id="loginScreen">
-            <div class="welcome-notice">
-                <i class="fa-solid fa-circle-info" style="color:var(--primary-red); margin-right:5px;"></i>
-                <strong>ยินดีต้อนรับเข้าสู่ RISZY XZIAM!</strong><br>
-                หากคุณยังไม่ได้เปิดใช้บริการ กรุณากดปุ่มด้านล่างเพื่อติดต่อแอดมินเพื่อลงทะเบียนรับคีย์ส่วนตัวของคุณเข้าใช้งานระบบ
-            </div>
-
-            <div class="input-group">
-                <input type="text" id="clientKey" class="input-field" placeholder="กรอกคีย์ของคุณที่นี่ (RISZY-XXXX-XXXX)">
-                <i class="fa-solid fa-key"></i>
-            </div>
-
-            <button class="btn btn-submit" onclick="loginWithKey()">
-                <i class="fa-solid fa-right-to-bracket"></i> ยืนยันข้อมูลเข้าสู่ระบบ
-            </button>
+        <div class="maintenance-screen" id="maintenanceViewBox" style="display: none;">
+            <div class="maintenance-icon"><i class="fa-solid fa-gears"></i></div>
+            <div class="maintenance-title">ระบบกำลังปิดปรับปรุงชั่วคราว</div>
             
-            <a href="#" id="contactBtn1" class="btn btn-facebook" target="_blank">
-                <i class="fa-brands fa-facebook"></i> สมัครใช้บริการ / ติดต่อแอดมิน
+            <div class="freeze-badge">
+                <i class="fa-solid fa-snowflake"></i> ระบบหยุดเวลากล่องสิทธิ์ของคุณไว้ให้แล้ว
+            </div>
+
+            <div class="maintenance-reason-box">
+                <strong style="color:var(--max-gold); font-size: 0.85rem; display:block; margin-bottom: 5px;">
+                    <i class="fa-solid fa-comment-dots"></i> ชี้แจงจากผู้พัฒนา:
+                </strong>
+                <span id="maintenanceReasonText">กำลังโหลดรายละเอียด...</span>
+            </div>
+
+            <a href="#" id="maintenanceContactBtn" class="btn btn-facebook" target="_blank">
+                <i class="fa-brands fa-facebook"></i> ติดต่อแอดมินด่วน / สอบถามข้อมูล
             </a>
         </div>
 
-        <div class="user-dashboard" id="dashboardScreen">
-            
-            <div class="navigation-bar">
-                <button class="nav-tab-btn active" onclick="switchTab('statusTab', this)">
-                    <i class="fa-solid fa-user-shield"></i> สถานะ
-                </button>
-                <button class="nav-tab-btn" onclick="switchTab('featuresTab', this)">
-                    <i class="fa-solid fa-sliders"></i> ฟังก์ชัน
-                </button>
-                <button class="nav-tab-btn" onclick="switchTab('launchTab', this)">
-                    <i class="fa-solid fa-gamepad"></i> เข้าเล่นเกม
-                </button>
+        <div class="announcement-box" id="announcementGlobalBox">
+            <i class="fa-solid fa-bullhorn"></i>
+            <div class="announcement-content">
+                <div class="announcement-title">ประกาศจากระบบ</div>
+                <div class="announcement-text" id="announcementTextText">กำลังโหลดประกาศล่าสุดจากเซิร์ฟเวอร์...</div>
             </div>
-
-            <div id="statusTab" class="tab-panel active">
-                <div class="profile-status-box">
-                    <div class="status-row">
-                        <span class="label-text"><i class="fa-solid fa-fingerprint"></i> Device ID:</span>
-                        <span id="deviceIdDisplay" class="val-uid">ID-000000</span>
-                    </div>
-                    <div class="status-row">
-                        <span class="label-text"><i class="fa-solid fa-shield-halved"></i> การเชื่อมต่อ:</span>
-                        <span style="color:var(--success-green); font-weight:600;"><i class="fa-solid fa-circle-check"></i> ปลอดภัย</span>
-                    </div>
-
-                    <div class="countdown-container">
-                        <div class="countdown-title"><i class="fa-regular fa-calendar-xmark"></i> วันที่หมดอายุ</div>
-                        <div id="expireDateDisplay" class="countdown-timer">กำลังประมวลผล...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="featuresTab" class="tab-panel">
-                <div class="features-header-title">
-                    <i class="fa-solid fa-crosshairs"></i> รายการระบบช่วยเดิมพัน
-                </div>
-                <div class="feature-list-box" id="featuresContainer">
-                    <div class="empty-features-fallback">กำลังโหลดรายการระบบจากคลาวด์...</div>
-                </div>
-            </div>
-
-            <div id="launchTab" class="tab-panel">
-                <div class="ios-notice-box">
-                    <i class="fa-solid fa-mobile-screen-button" style="margin-right: 4px;"></i> 
-                    <strong>คำแนะนำสำหรับผู้ใช้ iOS / iPhone:</strong><br>
-                    หากเกมไม่เปิดขึ้นมาอัตโนมัติ ให้กดเข้าตัวเกมผ่าน App Store ตามปกติหลังจากเปิดฟังก์ชันแล้ว ระบบจะประมวลผลอยู่เบื้องหลังครับ
-                </div>
-
-                <button class="btn btn-game-normal" onclick="injectSystem('normal')">
-                    <i class="fa-solid fa-circle-play"></i> เข้าสู่ Free Fire (ธรรมดา)
-                </button>
-
-                <button class="btn btn-game-max" onclick="injectSystem('max')">
-                    <i class="fa-solid fa-bolt"></i>เข้าสู่ Free Fire MAX
-                </button>
-            </div>
-
-            <a href="#" id="contactBtn2" class="btn btn-facebook" style="background: linear-gradient(135deg, #2b2d31 0%, #1e1f22 100%); margin-top: 15px;" target="_blank">
-                <i class="fa-solid fa-headset"></i> รายงานปัญหา / แจ้งเรื่องแก่แอดมิน
-            </a>
         </div>
 
-    </div>
-
-    <script>
-        // --- 1. ประกาศและกำหนดค่าคอนฟิกูเรชัน Firebase Firestore ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdVwtGix3Vspr0VVqW5-M5PL6IQZ-9guk",
-            authDomain: "kuku-bd6bd.firebaseapp.com",
-            projectId: "kuku-bd6bd",
-            storageBucket: "kuku-bd6bd.firebasestorage.app",
-            messagingSenderId: "20260309266",
-            appId: "1:20260309266:web:95cff78d1d9bc402344bcb",
-            measurementId: "G-1YNH71SD69"
-        };
+        <div class="auth-screen" id="loginScreen">            
+            <div class="welcome-notice">                
+                <i class="fa-solid fa-circle-info" style="color:var(--primary-red); margin-right:5px;"></i>                
+                <strong>ยินดีต้อนรับเข้าสู่ RISZY XZIAM!</strong><br>                
+                หากคุณยังไม่ได้เปิดใช้บริการ กรุณากดปุ่มด้านล่างเพื่อติดต่อแอดมินซื้อคีย์            
+            </div>            
+            <div class="input-group">                
+                <input type="text" id="clientKey" class="input-field" placeholder="กรอกคีย์ของคุณที่นี่ (RISZY-XXXX-XXXX)">                
+                <i class="fa-solid fa-key"></i>            
+            </div>            
+            <button class="btn btn-submit" onclick="loginWithKey()">                
+                <i class="fa-solid fa-right-to-bracket"></i> ยืนยันข้อมูลเข้าสู่ระบบ            
+            </button>                        
+            <a href="#" id="contactBtn1" class="btn btn-facebook" target="_blank">                
+                <i class="fa-brands fa-facebook"></i> สมัครใช้บริการ / ติดต่อแอดมิน            
+            </a>        
+        </div>        
         
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // ตัวแปรสำหรับเก็บ Listener ของผู้ใช้ปัจจุบัน เพื่อเช็คการเตะออกหรือรีเซ็ต
-        let currentSessionListener = null;
-
-        // --- 2. ฟังก์ชันสลับหน้าต่างแท็บเมนูย่อย ---
-        function switchTab(tabId, buttonElement) {
-            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+        <div class="user-dashboard" id="dashboardScreen">                        
+            <div class="navigation-bar">                
+                <button class="nav-tab-btn active" onclick="switchTab('statusTab', this)">                    
+                    <i class="fa-solid fa-user-shield"></i> สถานะ                
+                </button>                
+                <button class="nav-tab-btn" onclick="switchTab('featuresTab', this)">                    
+                    <i class="fa-solid fa-sliders"></i> ฟังก์ชัน                
+                </button>                
+                <button class="nav-tab-btn" onclick="switchTab('launchTab', this)">                    
+                    <i class="fa-solid fa-gamepad"></i> เข้าเล่นเกม                
+                </button>            
+            </div>            
             
-            document.getElementById(tabId).classList.add('active');
-            buttonElement.classList.add('active');
-        }
-
-        // --- 3. ฟังก์ชันสุ่มรหัสเครื่องผู้ใช้ประจำเครื่อง ---
-        let myDeviceId = localStorage.getItem('riszy_device_id');
-        if(!myDeviceId) {
-            myDeviceId = 'RISZY-ID-' + Math.floor(Math.random() * 900000 + 100000);
-            localStorage.setItem('riszy_device_id', myDeviceId);
-        }
-
-        // --- 4. ดึงลิงก์แอดมินจากระบบฐานข้อมูล ---
-        function initializeAdminContactLinks() {
-            db.collection("settings").doc("general").onSnapshot(doc => {
-                if(doc.exists && doc.data().facebookLink) {
-                    const fbUrl = doc.data().facebookLink;
-                    document.getElementById('contactBtn1').href = fbUrl;
-                    document.getElementById('contactBtn2').href = fbUrl;
-                }
-            }, error => {
-                console.error("เกิดความผิดพลาดในการเรียกข้อมูลลิงก์ผู้พัฒนา: ", error);
-            });
-        }
-        initializeAdminContactLinks();
-
-        // --- 5. ฟังก์ชันการเข้าสู่ระบบคีย์สิทธิ์การใช้งาน ---
-        function loginWithKey() {
-            const userInputKey = document.getElementById('clientKey').value.trim();
-            if(!userInputKey) {
-                return Swal.fire({
-                    icon: 'warning',
-                    title: 'กรุณากรอกคีย์',
-                    text: 'กรุณากรอกคีย์พรีเมียมส่วนตัวของคุณก่อนกดเข้าสู่ระบบครับ',
-                    confirmButtonColor: '#ff003c',
-                    background: '#120a0b',
-                    color: '#fff'
-                });
-            }
+            <div id="statusTab" class="tab-panel active">                
+                <div class="profile-status-box">                    
+                    <div class="status-row">                        
+                        <span class="label-text"><i class="fa-solid fa-fingerprint"></i> Device ID:</span>                        
+                        <span id="deviceIdDisplay" class="val-uid">ID-000000</span>                    
+                    </div>                    
+                    <div class="status-row">                        
+                        <span class="label-text"><i class="fa-solid fa-shield-halved"></i> การเชื่อมต่อ:</span>                        
+                        <span style="color:var(--success-green); font-weight:600;"><i class="fa-solid fa-circle-check"></i> ปลอดภัย</span>                    
+                    </div>                    
+                    <div class="countdown-container">                        
+                        <div class="countdown-title"><i class="fa-regular fa-calendar-xmark"></i> วันที่หมดอายุ</div>                        
+                        <div id="expireDateDisplay" class="countdown-timer">กำลังประมวลผล...</div>                    
+                    </div>                
+                </div>            
+            </div>            
             
-            Swal.fire({
-                title: 'กำลังเชื่อมต่อเซิร์ฟเวอร์...',
-                text: 'กรุณารอสักครู่ ระบบกำลังคัดกรองและตรวจสอบความถูกต้องของคีย์',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
-            verifyKeyInDatabase(userInputKey, false);
-        }
-
-        // --- 6. ตรวจสอบเงื่อนไขความปลอดภัยและผูกเครื่อง ---
-        function verifyKeyInDatabase(key, isSessionAutoLogin) {
-            db.collection("keys").doc(key).get().then(doc => {
-                if(!doc.exists) {
-                    Swal.close();
-                    if(!isSessionAutoLogin) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'ไม่พบคีย์ในระบบ',
-                            text: 'คีย์ที่คุณนำมาใช้ไม่มีอยู่จริงหรือถูกยกเลิกแล้ว โปรดติดต่อแอดมินเพื่อรับคีย์ใหม่',
-                            confirmButtonColor: '#ff003c',
-                            background: '#120a0b',
-                            color: '#fff'
-                        });
+            <div id="featuresTab" class="tab-panel">                
+                <div class="features-header-title">                    
+                    <i class="fa-solid fa-crosshairs"></i> รายการระบบช่วยเดิมพัน (เปิดใช้งานได้หลายฟังก์ชันพร้อมกัน)
+                </div>                
+                <div class="feature-list-box" id="featuresContainer">                    
+                    <div class="empty-features-fallback">กำลังโหลดรายการระบบจากคลาวด์...</div>                
+                </div>            
+            </div>            
+            
+            <div id="launchTab" class="tab-panel">                
+                <div class="ios-notice-box">                    
+                    <i class="fa-solid fa-mobile-screen-button" style="margin-right: 4px;"></i>                     
+                    <strong>คำแนะนำสำหรับผู้ใช้ :</strong><br> ตัวช่วยเล่นของทางเรา เเค่ช่วยลาก ไม่ได้ล็อค 
+                    กันโดนเเบน เช็คไม่เจอ หากมีปัญหา ไม่สามารถเข้าเกมได้ กดปุ่มติดต่อเเอดมินด้านล่าง
+                                    
+                </div>                
+                <button class="btn btn-game-normal" onclick="injectSystem('normal')">                    
+                    <i class="fa-solid fa-circle-play"></i> Free Fire (ธรรมดา)                
+                </button>                
+                <button class="btn btn-game-max" onclick="injectSystem('max')">                    
+                    <i class="fa-solid fa-bolt"></i> Free Fire MAX                
+                </button>            
+            </div>            
+            <a href="#" id="contactBtn2" class="btn btn-facebook" style="background: linear-gradient(135deg, #2b2d31 0%, #1e1f22 100%); margin-top: 15px;" target="_blank">                
+                <i class="fa-solid fa-headset"></i> รายงานปัญหา / แจ้งเรื่องแก่แอดมิน            
+            </a>        
+        </div>    
+    </div>    
+    
+    <script>        
+        // --- 1. ประกาศและกำหนดค่าคอนฟิกูเรชัน Firebase Firestore ---        
+        const firebaseConfig = {            
+            apiKey: "AIzaSyDdVwtGix3Vspr0VVqW5-M5PL6IQZ-9guk",            
+            authDomain: "kuku-bd6bd.firebaseapp.com",            
+            projectId: "kuku-bd6bd",            
+            storageBucket: "kuku-bd6bd.firebasestorage.app",            
+            messagingSenderId: "20260309266",            
+            appId: "1:20260309266:web:95cff78d1d9bc402344bcb",            
+            measurementId: "G-1YNH71SD69"        
+        };                
+        
+        firebase.initializeApp(firebaseConfig);        
+        const db = firebase.firestore();        
+        
+        // ตัวแปรเก็บ Listener และสถานะปัจจุบันของระบบ
+        let currentSessionListener = null;        
+        let isSystemInMaintenance = false;
+        
+        // --- 2. ฟังก์ชันสลับหน้าต่างแท็บเมนูย่อย ---        
+        function switchTab(tabId, buttonElement) {            
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));            
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));                        
+            document.getElementById(tabId).classList.add('active');            
+            buttonElement.classList.add('active');        
+        }        
+        
+        // --- 3. ฟังก์ชันสุ่มรหัสเครื่องผู้ใช้ประจำเครื่อง ---        
+        let myDeviceId = localStorage.getItem('riszy_device_id');        
+        if(!myDeviceId) {            
+            myDeviceId = 'RISZY-ID-' + Math.floor(Math.random() * 900000 + 100000);            
+            localStorage.setItem('riszy_device_id', myDeviceId);        
+        }        
+        
+        // --- 4. ดึงข้อมูลระบบประกาศ ลิงก์แอดมิน และเช็คการปิดปรับปรุง (เรียลไทม์ 100%) ---        
+        function initializeAdminConfigControl() {            
+            db.collection("settings").doc("general").onSnapshot(doc => {                
+                if(doc.exists) {
+                    const data = doc.data();
+                    
+                    // ระบบลิ้งก์ติดต่อสื่อสาร
+                    if (data.facebookLink) {
+                        document.getElementById('contactBtn1').href = data.facebookLink;                    
+                        document.getElementById('contactBtn2').href = data.facebookLink;                    
+                        document.getElementById('maintenanceContactBtn').href = data.facebookLink;                    
                     }
-                    localStorage.removeItem('riszy_saved_key');
+                    
+                    // ระบบประกาศข่าวสาร
+                    if (data.announcement) {
+                        document.getElementById('announcementTextText').innerText = data.announcement;
+                    } else {
+                        document.getElementById('announcementTextText').innerText = "ยินดีต้อนรับเข้าสู่ระบบ RISZY XZIAM เวอร์ชันพรีเมียม";
+                    }
+
+                    // 🛠️ ตรวจสอบเงื่อนไขการปิดปรับปรุงเว็บไซต์ (Maintenance Checker)
+                    if (data.maintenance === true) {
+                        isSystemInMaintenance = true;
+                        
+                        // ซ่อนหน้าเว็บใช้งานทั้งหมด
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('dashboardScreen').style.display = 'none';
+                        document.getElementById('announcementGlobalBox').style.display = 'none';
+                        
+                        // แสดงหน้าต่างปิดปรับปรุง พร้อมเหตุผล
+                        document.getElementById('maintenanceViewBox').style.display = 'block';
+                        document.getElementById('maintenanceReasonText').innerText = data.maintenanceReason ? data.maintenanceReason : "ขณะนี้แอดมินกำลังทำการอัปเดตระบบอุดรูรั่วและเพิ่มความเสถียรชั่วคราว โปรดกลับมาใหม่อีกครั้งในภายหลังครับ";
+                        
+                        // ดึงการแช่แข็งเวลาในหน้าแดชบอร์ด
+                        document.getElementById('expireDateDisplay').innerHTML = `<span style="color:var(--max-gold); font-weight:bold;">⏸️ ระบบหยุดเวลารองรับปิดปรับปรุง</span>`;
+                    } else {
+                        // หากแอดมินเปิดระบบใช้งานตามปกติ
+                        if (isSystemInMaintenance) {
+                            isSystemInMaintenance = false;
+                            window.location.reload(); // รีเฟรชหน้าจอเพื่อดึง session และหน้าจอกลับมาตามสถานะจริง
+                        }
+                    }
+                }            
+            }, error => {                
+                console.error("เกิดความผิดพลาดในการเรียกข้อมูลตั้งค่าเซิร์ฟเวอร์: ", error);            
+            });        
+        }        
+        initializeAdminConfigControl();        
+        
+        // ตรวจสอบข้อมูลล็อกอินเดิมค้างไว้
+        const savedKey = localStorage.getItem('riszy_saved_key');
+        if(savedKey) {
+            verifyKeyInDatabase(savedKey, true);
+        }
+
+        // --- 5. ฟังก์ชันการเข้าสู่ระบบคีย์สิทธิ์การใช้งาน ---        
+        function loginWithKey() {            
+            if (isSystemInMaintenance) return; // ป้องกันการกดหากระบบอยู่ในช่วงปิดปรับปรุง
+            
+            const userInputKey = document.getElementById('clientKey').value.trim();            
+            if(!userInputKey) {                
+                return Swal.fire({                    
+                    icon: 'warning',                    
+                    title: 'กรุณากรอกคีย์',                    
+                    text: 'กรุณากรอกคีย์พรีเมียมส่วนตัวของคุณก่อนกดเข้าสู่ระบบครับ',                    
+                    confirmButtonColor: '#ff003c',                    
+                    background: '#120a0b',                    
+                    color: '#fff'                
+                });            
+            }                        
+            Swal.fire({                
+                title: 'กำลังเชื่อมต่อเซิร์ฟเวอร์...',                
+                text: 'กรุณารอสักครู่ ระบบกำลังคัดกรองและตรวจสอบความถูกต้องของคีย์',                
+                allowOutsideClick: false,                
+                didOpen: () => { Swal.showLoading(); }            
+            });            
+            verifyKeyInDatabase(userInputKey, false);        
+        }        
+        
+        // --- 6. ตรวจสอบเงื่อนไขความปลอดภัยและผูกเครื่อง ---        
+        function verifyKeyInDatabase(key, isSessionAutoLogin) {            
+            db.collection("keys").doc(key).get().then(doc => {                
+                if(!doc.exists) {                    
+                    Swal.close();                    
+                    if(!isSessionAutoLogin) {                        
+                        Swal.fire({                            
+                            icon: 'error',                            
+                            title: 'ไม่พบคีย์ในระบบ',                            
+                            text: 'คีย์ที่คุณนำมาใช้ไม่มีอยู่จริงหรือถูกยกเลิกแล้ว โปรดติดต่อแอดมินเพื่อรับคีย์ใหม่',                            
+                            confirmButtonColor: '#ff003c',                            
+                            background: '#120a0b',                            
+                            color: '#fff'                        
+                        });                    
+                    }                    
+                    localStorage.removeItem('riszy_saved_key');                    
+                    return;                
+                }                
+                const keyData = doc.data();                
+                const currentServerTimestamp = new Date().getTime();                
+                
+                if(keyData.status === "unused") {                    
+                    const calculatedExpiryTime = keyData.expiresAt ? keyData.expiresAt : (currentServerTimestamp + (keyData.days * 24 * 60 * 60 * 1000));                                        
+                    db.collection("keys").doc(key).update({                        
+                        status: "used",                        
+                        deviceId: myDeviceId,                        
+                        expiresAt: calculatedExpiryTime                    
+                    }).then(() => {                        
+                        if(!isSystemInMaintenance) executeSuccessfulLogin(key);                    
+                    }).catch(err => {                        
+                        Swal.fire('เกิดข้อผิดพลาดในการบันทึกสิทธิ์', err.message, 'error');                    
+                    });                
+                }                 
+                else if (keyData.status === "used") {                    
+                    if(keyData.deviceId && keyData.deviceId !== myDeviceId) {                        
+                        Swal.close();                        
+                        Swal.fire({                            
+                            icon: 'error',                            
+                            title: 'คีย์นี้ถูกปฏิเสธสิทธิ์',                            
+                            text: 'ขออภัย คีย์ส่วนตัวนี้ถูกผูกไว้กับเครื่องอื่นแล้ว ไม่สามารถเข้าใช้งานพร้อมกันได้',                            
+                            confirmButtonColor: '#ff003c',                            
+                            background: '#120a0b',                            
+                            color: '#fff'                        
+                        });                        
+                        if(!isSessionAutoLogin) localStorage.removeItem('riszy_saved_key');                        
+                        return;                    
+                    }                    
+                    
+                    // หากไม่ได้อยู่ในช่วงปิดปรับปรุงและเวลาหมดอายุจริง ให้เช็คตามปกติ
+                    if(!isSystemInMaintenance && currentServerTimestamp > keyData.expiresAt) {                        
+                        Swal.close();                        
+                        Swal.fire({                            
+                            icon: 'error',                            
+                            title: 'คีย์นี้หมดอายุแล้ว',                            
+                            text: 'ระยะเวลาสิทธิ์พรีเมียมของคุณสิ้นสุดลงแล้ว กรุณาซื้ออายุคีย์เพิ่มเพื่อเปิดฟังก์ชันอีกครั้ง',                            
+                            confirmButtonColor: '#ff003c',                            
+                            background: '#120a0b',                            
+                            color: '#fff'                        
+                        });                        
+                        localStorage.removeItem('riszy_saved_key');                        
+                        return;                    
+                    }                    
+                    if(!keyData.deviceId) {                        
+                        db.collection("keys").doc(key).update({                            
+                            deviceId: myDeviceId                        
+                        }).then(() => {                            
+                            if(!isSystemInMaintenance) executeSuccessfulLogin(key);                        
+                        });                    
+                    } else {                        
+                        if(!isSystemInMaintenance) executeSuccessfulLogin(key);                    
+                    }                
+                }            
+            }).catch(error => {                
+                Swal.close();                
+                console.error("ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ", error);                
+            });        
+        }        
+        
+        // --- 7. เปลี่ยนการแสดงผลหลังล็อกอินผ่าน ---        
+        function executeSuccessfulLogin(verifiedKey) {            
+            Swal.close();            
+            localStorage.setItem('riszy_saved_key', verifiedKey);                        
+            document.getElementById('loginScreen').style.display = 'none';            
+            document.getElementById('dashboardScreen').style.display = 'block';            
+            document.getElementById('deviceIdDisplay').innerText = myDeviceId;            
+            
+            // เริ่มการตรวจสอบคีย์แบบ Real-time            
+            startRealTimeSessionMonitor(verifiedKey);            
+            renderCloudFeaturesList();        
+        }        
+        
+        // --- 8. ระบบตรวจสอบเซสชั่นและแสดงวันที่หมดอายุ (Real-time Kicking) ---        
+        function startRealTimeSessionMonitor(key) {            
+            if(currentSessionListener) currentSessionListener();             
+            currentSessionListener = db.collection("keys").doc(key).onSnapshot(doc => {                
+                if (!doc.exists) {                    
+                    return triggerForceLogout('คีย์ถูกลบออกจากระบบ', 'คีย์ของคุณถูกเพิกถอนโดยแอดมิน กรุณาติดต่อผู้ดูแล');                
+                }                
+                const keyData = doc.data();                
+                const nowTimestamp = new Date().getTime();                
+                
+                // หากหน้าเว็บอยู่ในโหมดปิดปรับปรุงอยู่ ให้ข้ามการเช็คหมดอายุชั่วคราวเพื่อหยุดตรึงเวลาไว้
+                if (isSystemInMaintenance) {
+                    document.getElementById('expireDateDisplay').innerHTML = `<span style="color:var(--max-gold); font-weight:bold;"><i class="fa-solid fa-snowflake"></i> หยุดเวลาชั่วคราว (เซิร์ฟเวอร์ปิดปรับปรุง)</span>`;
                     return;
                 }
 
-                const keyData = doc.data();
-                const currentServerTimestamp = new Date().getTime();
-
-                if(keyData.status === "unused") {
-                    // 🔴 [จุดแก้ไขสำเร็จ] เช็คก่อนว่าคีย์มีค่าเวลาเก่าฝังอยู่ไหม ถ้ามีให้ใช้ค่าเก่า ห้ามเอาเวลาปัจจุบันไปบวกใหม่เด็ดขาด!
-                    const calculatedExpiryTime = keyData.expiresAt ? keyData.expiresAt : (currentServerTimestamp + (keyData.days * 24 * 60 * 60 * 1000));
-                    
-                    db.collection("keys").doc(key).update({
-                        status: "used",
-                        deviceId: myDeviceId,
-                        expiresAt: calculatedExpiryTime
-                    }).then(() => {
-                        executeSuccessfulLogin(key);
-                    }).catch(err => {
-                        Swal.fire('เกิดข้อผิดพลาดในการบันทึกสิทธิ์', err.message, 'error');
-                    });
-                } 
-                else if (keyData.status === "used") {
-                    if(keyData.deviceId && keyData.deviceId !== myDeviceId) {
-                        Swal.close();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'คีย์นี้ถูกปฏิเสธสิทธิ์',
-                            text: 'ขออภัย คีย์ส่วนตัวนี้ถูกผูกไว้กับเครื่องอื่นแล้ว ไม่สามารถเข้าใช้งานพร้อมกันได้',
-                            confirmButtonColor: '#ff003c',
-                            background: '#120a0b',
-                            color: '#fff'
-                        });
-                        if(!isSessionAutoLogin) localStorage.removeItem('riszy_saved_key');
-                        return;
-                    }
-
-                    if(currentServerTimestamp > keyData.expiresAt) {
-                        Swal.close();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'คีย์นี้หมดอายุแล้ว',
-                            text: 'ระยะเวลาสิทธิ์พรีเมียมของคุณสิ้นสุดลงแล้ว กรุณาซื้ออายุคีย์เพิ่มเพื่อเปิดฟังก์ชันอีกครั้ง',
-                            confirmButtonColor: '#ff003c',
-                            background: '#120a0b',
-                            color: '#fff'
-                        });
-                        localStorage.removeItem('riszy_saved_key');
-                        return;
-                    }
-
-                    // หากข้อมูลถูกต้องและแอดมินเพิ่งรีเซ็ต (deviceId ว่าง) ให้จับผูกเครื่องใหม่
-                    if(!keyData.deviceId) {
-                        db.collection("keys").doc(key).update({
-                            deviceId: myDeviceId
-                        }).then(() => {
-                            executeSuccessfulLogin(key);
-                        });
-                    } else {
-                        executeSuccessfulLogin(key);
-                    }
-                }
-            }).catch(error => {
-                Swal.close();
-                console.error("ไม่สามารถตรวจสอบข้อมูลกับคลาวด์ได้: ", error);
-                if(!isSessionAutoLogin) {
-                    Swal.fire('ระบบล้มเหลว', 'ไม่สามารถเข้าถึงฐานข้อมูลเพื่อยืนยันสถานะได้ในขณะนี้', 'error');
-                }
-            });
-        }
-
-        // --- 7. เปลี่ยนการแสดงผลหลังล็อกอินผ่าน ---
-        function executeSuccessfulLogin(verifiedKey) {
-            Swal.close();
-            localStorage.setItem('riszy_saved_key', verifiedKey);
-            
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboardScreen').style.display = 'block';
-            document.getElementById('deviceIdDisplay').innerText = myDeviceId;
-
-            // เริ่มการตรวจสอบคีย์แบบ Real-time
-            startRealTimeSessionMonitor(verifiedKey);
-            renderCloudFeaturesList();
-        }
-
-        // --- 8. ระบบตรวจสอบเซสชั่นและแสดงวันที่หมดอายุ (Real-time Kicking) ---
-        function startRealTimeSessionMonitor(key) {
-            if(currentSessionListener) currentSessionListener(); // ยกเลิกการซิงค์ตัวเก่าถ้ามี
-
-            currentSessionListener = db.collection("keys").doc(key).onSnapshot(doc => {
-                if (!doc.exists) {
-                    return triggerForceLogout('คีย์ถูกลบออกจากระบบ', 'คีย์ของคุณถูกเพิกถอนโดยแอดมิน กรุณาติดต่อผู้ดูแล');
-                }
-
-                const keyData = doc.data();
-                const nowTimestamp = new Date().getTime();
-
-                // เช็คว่าหมดอายุหรือยัง
-                if (nowTimestamp > keyData.expiresAt) {
-                    return triggerForceLogout('หมดสิทธิ์การใช้งาน', 'คีย์ของคุณหมดอายุลงแล้ว');
-                }
-
-                // หากแอดมินรีเซ็ต Device ID หรือเปลี่ยนสถานะกลางคัน
-                if (keyData.status !== 'used' || (keyData.deviceId && keyData.deviceId !== myDeviceId)) {
-                    return triggerForceLogout('เซสชันถูกยกเลิก', 'แอดมินได้ทำการรีเซ็ตเครื่อง หรือมีการเข้าสู่ระบบซ้อน กรุณาล็อกอินใหม่');
-                }
-
-                // แปลงเวลา Timestamp เป็นวันที่แสดงผลสวยงาม
-                const expiryDateObj = new Date(keyData.expiresAt);
-                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                const formattedDate = expiryDateObj.toLocaleString('th-TH', options);
-
-                document.getElementById('expireDateDisplay').innerText = formattedDate;
-
-            }, err => {
-                console.error("เกิดข้อผิดพลาดในการรับข้อมูล Real-time: ", err);
-            });
-        }
-
-        function triggerForceLogout(title, text) {
-            if(currentSessionListener) currentSessionListener(); // ยกเลิกการดึงข้อมูล
-            localStorage.removeItem('riszy_saved_key');
+                if (nowTimestamp > keyData.expiresAt) {                    
+                    return triggerForceLogout('หมดสิทธิ์การใช้งาน', 'คีย์ของคุณหมดอายุลงแล้ว');                
+                }                
+                if (keyData.status !== 'used' || (keyData.deviceId && keyData.deviceId !== myDeviceId)) {                    
+                    return triggerForceLogout('เซสชันถูกยกเลิก', 'แอดมินได้ทำการรีเซ็ตเครื่อง หรือมีการเข้าสู่ระบบซ้อน กรุณาล็อกอินใหม่');                
+                }                
+                
+                const expiryDateObj = new Date(keyData.expiresAt);                
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };                
+                const formattedDate = expiryDateObj.toLocaleString('th-TH', options);                
+                document.getElementById('expireDateDisplay').innerText = formattedDate;            
+            }, err => {                
+                console.error("เกิดข้อผิดพลาดในการดึงข้อมูล Real-time: ", err);            
+            });        
+        }        
+        
+        function triggerForceLogout(title, text) {            
+            if(currentSessionListener) currentSessionListener();             
+            localStorage.removeItem('riszy_saved_key');                        
+            Swal.fire({                
+                icon: 'warning',                
+                title: title,                
+                text: text,                
+                confirmButtonColor: '#ff003c',                
+                background: '#120a0b',                
+                color: '#fff',                
+                allowOutsideClick: false            }).then(() => {                
+                window.location.reload();            
+            });        
+        }        
+        
+        // --- 9. ดึงรายชื่อสคริปต์ฟังก์ชันช่วยเหลือจาก Cloud ---        
+        function renderCloudFeaturesList() {            
+            const container = document.getElementById('featuresContainer');                        
+            db.collection("features").onSnapshot(snapshot => {                
+                container.innerHTML = '';                                
+                if(snapshot.empty) {                    
+                    container.innerHTML = '<div class="empty-features-fallback">แอดมินยังไม่ได้เปิดระบบฟังก์ชันในขณะนี้</div>';                    
+                    return;                
+                }                
+                snapshot.forEach(doc => {                    
+                    const data = doc.data();                    
+                    const itemHtmlStr = `                        
+                        <div class="feature-card-item">                            
+                            <div class="feature-info">                                
+                                <i class="fa-solid fa-crosshairs"></i>                                
+                                <span class="feature-name-txt">${data.name}</span>                            
+                            </div>                            
+                            <label class="radio-switch-wrapper">                                
+                                <input type="checkbox" name="featurePremiumGroup" value="${data.name}">                                
+                                <span class="radio-switch-slider"></span>                            
+                            </label>                        
+                        </div>                    
+                    `;                    
+                    container.innerHTML += itemHtmlStr;                
+                });            
+            }, err => {                
+                console.error("ไม่สามารถโหลดข้อมูลฟังก์ชันได้: ", err);                
+            });        
+        }        
+        
+        // --- 10. ระบบฉีดสคริปต์และรันตัวเกมพรีเมียม ---        
+        function injectSystem(gameType) {            
+            const activatedOptions = document.querySelectorAll('input[name="featurePremiumGroup"]:checked');                        
+            if(activatedOptions.length === 0) {                
+                return Swal.fire({                    
+                    background: '#120a0b',                    
+                    color: '#fff',                    
+                    icon: 'warning',                    
+                    title: 'ยังไม่ได้เลือกฟังก์ชัน!',                    
+                    text: 'กรุณาไปที่แท็บ "ฟังก์ชัน" เพื่อเลือกเปิดระบบตัวช่วยที่คุณต้องการสั่งรันอย่างน้อย 1 ฟังก์ชันก่อนครับ',                    
+                    confirmButtonColor: '#ff003c'                
+                });            
+            }            
             
             Swal.fire({
-                icon: 'warning',
-                title: title,
-                text: text,
-                confirmButtonColor: '#ff003c',
+                title: 'กำลังเชื่อมต่อบายพาส...',
+                html: 'ระบบกำลังเริ่มทำการสั่งฉีดข้อมูลตัวช่วยที่เลือกเข้าสู่ระบบหลัก',
                 background: '#120a0b',
                 color: '#fff',
-                allowOutsideClick: false
-            }).then(() => {
-                window.location.reload();
-            });
-        }
-
-        // --- 9. ดึงรายชื่อสคริปต์ฟังก์ชันช่วยเหลือจาก Cloud ---
-        function renderCloudFeaturesList() {
-            const container = document.getElementById('featuresContainer');
-            
-            db.collection("features").onSnapshot(snapshot => {
-                container.innerHTML = '';
-                
-                if(snapshot.empty) {
-                    container.innerHTML = '<div class="empty-features-fallback">แอดมินยังไม่ได้เปิดระบบฟังก์ชันในขณะนี้</div>';
-                    return;
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    setTimeout(() => { Swal.update({ title: 'กำลังเจาะระบบแอนตี้ชีท...', html: 'กำลังหลบเลี่ยงความปลอดภัยเครือข่ายเซิร์ฟเวอร์เกม' }); }, 1200);
+                    setTimeout(() => { Swal.update({ title: 'ฉีดฟังก์ชันสำเร็จ!', html: 'เตรียมพร้อมสลับหน้าต่างไปยังแอปพลิเคชันเกมสักครู่...', icon: 'success' }); Swal.hideLoading(); }, 2500);
+                    setTimeout(() => { executeLaunchGame(gameType); }, 3800);
                 }
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const itemHtmlStr = `
-                        <div class="feature-card-item">
-                            <div class="feature-info">
-                                <i class="fa-solid fa-crosshairs"></i>
-                                <span class="feature-name-txt">${data.name}</span>
-                            </div>
-                            <label class="radio-switch-wrapper">
-                                <input type="radio" name="featurePremiumGroup" value="${data.name}">
-                                <span class="radio-switch-slider"></span>
-                            </label>
-                        </div>
-                    `;
-                    container.innerHTML += itemHtmlStr;
-                });
-            }, err => {
-                console.error("ไม่สามารถโหลดข้อมูลฟังก์ชันได้: ", err);
-                container.innerHTML = '<div class="empty-features-fallback" style="color:red;">การโหลดข้อมูลฟังก์ชันขัดข้อง</div>';
             });
         }
 
-        // --- 10. ระบบฉีดสคริปต์และรันตัวเกม (กู้คืนส่วนโค้ดที่ขาดหายให้สมบูรณ์) ---
-        function injectSystem(gameType) {
-            const activatedRadioOption = document.querySelector('input[name="featurePremiumGroup"]:checked');
+        function executeLaunchGame(gameType) {
+            Swal.close();
+            const isMax = (gameType === 'max');            
+            const iosScheme = isMax ? "freefiremax://" : "freefire://";            
+            const androidIntent = isMax                 
+                ? "intent://#Intent;package=com.dts.freefiremax;scheme=freefiremax;end;"                
+                : "intent://#Intent;package=com.dts.freefireth;scheme=freefire;end;";            
+            const iosAppStoreUrl = isMax                
+                ? "https://apps.apple.com/th/app/garena-free-fire-max/id1480516829"                
+                : "https://apps.apple.com/th/app/garena-free-fire/id1300146617";            
             
-            if(!activatedRadioOption) {
-                return Swal.fire({
-                    background: '#120a0b',
-                    color: '#fff',
-                    icon: 'warning',
-                    title: 'ยังไม่ได้เลือกฟังก์ชัน!',
-                    text: 'กรุณาไปที่แท็บ "ฟังก์ชัน" เพื่อเลือกเปิดระบบตัวช่วยที่คุณต้องการสั่งรันก่อนครับ',
-                    confirmButtonColor: '#ff003c'
-                });
-            }
-
-            const isMax = (gameType === 'max');
-            const gameTitle = isMax ? "Free Fire MAX" : "Free Fire (ธรรมดา)";
-            const iosScheme = isMax ? "freefiremax://" : "freefire://";
-            const androidIntent = isMax 
-                ? "intent://#Intent;package=com.dts.freefiremax;scheme=freefiremax;end;"
-                : "intent://#Intent;package=com.dts.freefireth;scheme=freefire;end;";
-            const iosAppStoreUrl = isMax
-                ? "https://apps.apple.com/th/app/garena-free-fire-max/id1480516829"
-                : "https://apps.apple.com/th/app/garena-free-fire/id1300146617";
-
-            const checkIsAppleIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-            if(checkIsAppleIOS) {
-                Swal.fire({
-                    background: '#120a0b',
-                    color: '#fff',
-                    title: 'กำลังเปิดเข้าเกม...',
-                    text: `ระบบกำลังพาคุณข้ามไปยังหน้าโปรแกรม ${gameTitle}`,
-                    icon: 'info',
-                    confirmButtonColor: '#ff003c'
-                });
+            const checkIsAppleIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);            
+            
+            if(checkIsAppleIOS) {                
                 window.location.href = iosScheme;
-                setTimeout(() => {
-                    window.location.href = iosAppStoreUrl;
-                }, 2500);
+                setTimeout(() => { window.location.href = iosAppStoreUrl; }, 1500);
             } else {
-                Swal.fire({
-                    background: '#120a0b',
-                    color: '#fff',
-                    title: 'ฉีดระบบสำเร็จ!',
-                    text: `กำลังเชื่อมต่อระบบเบื้องหลังและรันเกม ${gameTitle}`,
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
                 window.location.href = androidIntent;
             }
         }
 
-        // เช็คล็อกอินอัตโนมัติหากเคยเข้าใช้งานสำเร็จมาก่อน
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('riszy_saved_key');
-            if(savedKey) {
-                document.getElementById('clientKey').value = savedKey;
-                verifyKeyInDatabase(savedKey, true);
+        // --- 11. อะนิเมชั่นพาร์ทิเคิลฉากหลัง (Particle Effect) ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.6 - 0.1;
+                this.alpha = Math.random() * 0.5 + 0.2;
             }
-            initParticleBackground(); // รันระบบเอฟเฟกต์พื้นหลัง
-        });
-
-        // --- 11. ระบบจำลองเอฟเฟกต์เม็ดฝุ่นเนออนแดงวิ่งในพื้นหลัง (Particle Canvas) ---
-        function initParticleBackground() {
-            const canvas = document.getElementById('particleCanvas');
-            const ctx = canvas.getContext('2d');
-            let particlesArray = [];
-
-            function setCanvasSize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
             }
-            window.addEventListener('resize', setCanvasSize);
-            setCanvasSize();
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2 + 0.5;
-                    this.speedX = Math.random() * 0.4 - 0.2;
-                    this.speedY = Math.random() * -0.5 - 0.1;
-                    this.alpha = Math.random() * 0.4 + 0.2;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.y < 0) {
-                        this.y = canvas.height;
-                        this.x = Math.random() * canvas.width;
-                    }
-                }
-                draw() {
-                    ctx.fillStyle = `rgba(255, 0, 60, ${this.alpha})`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = '#ff003c'; ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
             }
-
-            for (let i = 0; i < 45; i++) {
-                particlesArray.push(new Particle());
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particlesArray.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
         }
+        for(let i=0; i<45; i++) { particles.push(new Particle()); }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
     </script>
-</body>
-</html>
+</body></html>
